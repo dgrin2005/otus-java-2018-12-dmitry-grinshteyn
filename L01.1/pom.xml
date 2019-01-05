@@ -20,6 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <com.google.guava.version>27.0.1-jre</com.google.guava.version>
         <org.apache.commons.lang.version>3.8.1</org.apache.commons.lang.version>
     </properties>
 
@@ -30,12 +31,16 @@
             <artifactId>commons-lang3</artifactId>
             <version>${org.apache.commons.lang.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${com.google.guava.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
-
         <finalName>${project.name}</finalName>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -76,9 +81,5 @@
                 </configuration>
             </plugin>
         </plugins>
-
     </build>
-
-
-
 </project>
