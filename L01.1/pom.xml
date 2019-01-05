@@ -98,9 +98,8 @@
                     <proguardVersion>${net.sf.proguard.version}</proguardVersion>
                     <obfuscate>true</obfuscate>
                     <options>
-                        <option>-keep class ru.otus.MainClass</option>
+                        <option>-keep public class ru.otus.MainClass{public static void main(java.lang.String[]);}</option>
                     </options>
-                    <outjar>${project.name}</outjar>
                     <libs>
                         <lib>${java.home}/lib/rt.jar</lib>
                         <lib>${java.home}/lib/jce.jar</lib>
