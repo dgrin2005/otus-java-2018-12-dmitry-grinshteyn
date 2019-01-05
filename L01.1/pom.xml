@@ -100,6 +100,7 @@
                     <options>
                         <option>-keep class ru.otus.MainClass</option>
                     </options>
+                    <outjar>${project.name}</outjar>
                     <libs>
                         <lib>${java.home}/lib/rt.jar</lib>
                         <lib>${java.home}/lib/jce.jar</lib>
