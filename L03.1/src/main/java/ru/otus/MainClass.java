@@ -1,6 +1,7 @@
 package ru.otus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 
 public class MainClass {
@@ -11,12 +12,19 @@ public class MainClass {
         myArrayList1.add("D");
         myArrayList1.add("C");
         myArrayList1.add("B");
+        myArrayList1.add("J");
+        myArrayList1.add("L");
+        myArrayList1.add("F");
+        myArrayList1.add("K");
+        myArrayList1.add("G");
+        myArrayList1.add("I");
+        myArrayList1.add("H");
         myArrayList1.add("E");
         myArrayList1.add("A");
         System.out.println("New array  <String>: " + myArrayList1);
 
-        MyArrayList.sort(myArrayList1, Comparator.comparing(String::toString));
-        System.out.println("Sorted array: " + myArrayList1);
+        Collections.sort(myArrayList1);
+        System.out.println("(Collections.sort) Sorted array: " + myArrayList1);
 
         myArrayList1.remove(2);
         System.out.println("Removed element (index 2): " + myArrayList1);
@@ -36,10 +44,17 @@ public class MainClass {
         System.out.println("Removed collection [X, Z]: " + myArrayList1);
 
         arrayList.clear();
-        arrayList.add("E");
+        arrayList.add("A");
         arrayList.add("B");
-        myArrayList1.retainAll(arrayList);  //некорректно, меняется порядок
-        System.out.println("Retained collection [E, B]: " + myArrayList1);
+        arrayList.add("C");
+        arrayList.add("D");
+        arrayList.add("E");
+        arrayList.add("F");
+        arrayList.add("G");
+        arrayList.add("H");
+        arrayList.add("I");
+        myArrayList1.retainAll(arrayList);
+        System.out.println("Retained collection " + arrayList + ": " + myArrayList1);
 
         myArrayList1.add("E");
         System.out.println("Array: " + myArrayList1);
@@ -47,12 +62,8 @@ public class MainClass {
         System.out.println("Last index of \"E\": " + myArrayList1.lastIndexOf("E"));
         System.out.println("Index of \"A\": " + myArrayList1.indexOf("A"));
 
-        myArrayList1.addAll(arrayList, "1", "2", "3");
-        System.out.println("Added collection [E, B] and elements 1, 2, 3: " + myArrayList1);
-
-        MyArrayList<String> myArrayList2 = new MyArrayList<>();
-        MyArrayList.copy(myArrayList2, myArrayList1);
-        System.out.println("Copied array: " + myArrayList2);
+        Collections.addAll(myArrayList1, "1", "2", "3");
+        System.out.println("(Collections.addAll) Added elements 1, 2, 3: " + myArrayList1);
 
         myArrayList1.clear();
         System.out.println("Cleared array: " + myArrayList1);
@@ -65,9 +76,21 @@ public class MainClass {
         myArrayList3.add(8);
         System.out.println("New array <Integer>: " + myArrayList3);
 
-        MyArrayList.sort(myArrayList3, (o1, o2) -> (o1 - o2));
-        System.out.println("Sorted array: " + myArrayList3);
-        System.out.println("Sublist (2, 4): " + myArrayList3.subList(2, 4));
+        Collections.sort(myArrayList3);
+        System.out.println("(Collections.sort) Sorted array: " + myArrayList3);
+
+        MyArrayList<Integer> myArrayList2 = new MyArrayList<>();
+        myArrayList2.add(0);
+        myArrayList2.add(0);
+        myArrayList2.add(0);
+        myArrayList2.add(0);
+        myArrayList2.add(0);
+        myArrayList2.add(0);
+        System.out.println("Destination array: " + myArrayList2);
+        Collections.copy(myArrayList2, myArrayList3);
+        System.out.println("(Collections.copy) Copied array: " + myArrayList2);
+
+        System.out.println("Sublist (2, 4): " + myArrayList2.subList(2, 4));
 
     }
 
