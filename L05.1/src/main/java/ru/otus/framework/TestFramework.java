@@ -10,35 +10,40 @@ import java.util.List;
 
 public class TestFramework {
 
-    public static void start(String className, String methodName) {
+    public static void start(String className) {
         try {
-            Class cl = Class.forName(className);
-            Method mt = cl.getMethod(methodName);
-            if (mt != null && isTestMethod(mt)) {
-                start(cl, mt);
-            } else {
-                error("No test method " + methodName);
-            }
+            start(Class.forName(className));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void start(Class cl, Method mt) throws Exception {
+    public static void start(Class cl) {
         Method methodBefore = getBeforeMethod(cl);
         Method methodAfter = getAfterMethod(cl);
-        Object obj = cl.newInstance();
+        List<Method> methodList = findMethods(cl, Test.class);
+        for (Method method : methodList) {
+            startTestMethod(cl, method, methodBefore, methodAfter);
+        }
+    }
+
+    private static void startTestMethod(Class cl, Method method, Method methodBefore, Method methodAfter) {
         try {
-            if (methodBefore != null) {
-                methodBefore.invoke(obj);
+            Object obj = cl.newInstance();
+            try {
+                if (methodBefore != null) {
+                    methodBefore.invoke(obj);
+                }
+                method.invoke(obj);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                if (methodAfter != null) {
+                    methodAfter.invoke(obj);
+                }
             }
-            mt.invoke(obj);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        } finally {
-            if (methodAfter != null) {
-                methodAfter.invoke(obj);
-            }
+            ex.printStackTrace();
         }
     }
 
@@ -70,10 +75,6 @@ public class TestFramework {
                 return null;
             }
         }
-    }
-
-    private static boolean isTestMethod(Method mt) {
-        return mt.getAnnotation(Test.class) != null;
     }
 
     private static List<Method> findMethods(Class cl, Class find) {

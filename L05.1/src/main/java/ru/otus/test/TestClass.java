@@ -11,6 +11,7 @@ public class TestClass {
 
     @Before
     public void doBeforeTest() {
+        System.out.println();
         System.out.println("Before Test");
     }
 
@@ -47,5 +48,6 @@ public class TestClass {
     @After
     public void doAfterTest() {
         System.out.println("After Test");
+        System.out.println();
     }
 }
