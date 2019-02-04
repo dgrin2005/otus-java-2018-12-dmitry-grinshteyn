@@ -1,8 +1,8 @@
-package ru.otus;
+package ru.otus.framework;
 
-import ru.otus.annotation.After;
-import ru.otus.annotation.Before;
-import ru.otus.annotation.Test;
+import ru.otus.framework.annotation.After;
+import ru.otus.framework.annotation.Before;
+import ru.otus.framework.annotation.Test;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class TestFramework {
     }
 
     private static Method getBeforeMethod(Class cl) {
-        List<Method> methodList = findMethod(cl, Before.class);
+        List<Method> methodList = findMethods(cl, Before.class);
         if (methodList.size() > 1) {
             error("Too many @Before");
             throw new RuntimeException("Too many @Before");
@@ -58,7 +58,7 @@ public class TestFramework {
     }
 
     private static Method getAfterMethod(Class cl) {
-        List<Method> methodList = findMethod(cl, After.class);
+        List<Method> methodList = findMethods(cl, After.class);
         if (methodList.size() > 1) {
             error("Too many @After");
             throw new RuntimeException("Too many @After");
@@ -76,7 +76,7 @@ public class TestFramework {
         return mt.getAnnotation(Test.class) != null;
     }
 
-    private static List<Method> findMethod(Class cl, Class find) {
+    private static List<Method> findMethods(Class cl, Class find) {
         Method[] methods = cl.getDeclaredMethods();
         List<Method> methodList = new ArrayList<>();
         for (Method m : methods) {
@@ -87,57 +87,12 @@ public class TestFramework {
         return methodList;
     }
 
-    private static void error (String str) {
-        System.out.println("&&& " + str);
+    public static void error (String str) {
+        System.out.println("--- " + str);
     }
 
-    private static void success (String str) {
-        System.out.println("!!! " + str);
-    }
-
-    public static void assertTrue(boolean condition) {
-        if (condition) {
-            success("Assertion successful");
-        } else {
-            error("Assertion error");
-        }
-
-    }
-
-    public static void assertFalse(boolean condition) {
-        if (!condition) {
-            success("Assertion successful");
-        } else {
-            error("Assertion error");
-        }
-
-    }
-
-    public static void assertEquals(int a, int b) {
-        if (a == b) {
-            success("Assertion successful");
-        } else {
-            error("Assertion error");
-        }
-
-    }
-
-    public static void assertEquals(double a, double b, double delta) {
-        if (Math.abs(a - b) <= delta) {
-            success("Assertion successful");
-        } else {
-            error("Assertion error");
-        }
-
-    }
-
-    public static void assertEquals(String a, String  b) {
-        if (a.equals(b)) {
-            success("Assertion successful");
-        } else {
-            error("Assertion error");
-        }
-
+    public static void success (String str) {
+        System.out.println("+++ " + str);
     }
 
 }

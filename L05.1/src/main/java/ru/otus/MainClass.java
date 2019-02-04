@@ -1,6 +1,6 @@
 package ru.otus;
 
-import static ru.otus.TestFramework.start;
+import static ru.otus.framework.TestFramework.start;
 
 public class MainClass {
 

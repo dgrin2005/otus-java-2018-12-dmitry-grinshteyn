@@ -1,11 +1,11 @@
 package ru.otus.test;
 
-import ru.otus.annotation.After;
-import ru.otus.annotation.Before;
-import ru.otus.annotation.Test;
+import ru.otus.framework.annotation.After;
+import ru.otus.framework.annotation.Before;
+import ru.otus.framework.annotation.Test;
 
-import static ru.otus.TestFramework.assertEquals;
-import static ru.otus.TestFramework.assertTrue;
+import static ru.otus.framework.Assertion.assertEquals;
+import static ru.otus.framework.Assertion.assertTrue;
 
 public class TestClass {
 
