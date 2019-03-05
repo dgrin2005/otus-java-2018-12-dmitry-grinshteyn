@@ -68,6 +68,10 @@ public class ATM {
     }
 
     public ATM getSum(Integer sum) {
+        Map<Integer, Integer> banknoteCellsCurrentState = new TreeMap<>(Collections.reverseOrder());
+        for (Map.Entry<Integer, Integer> cell : banknoteCells.entrySet()) {
+            banknoteCellsCurrentState.put(cell.getKey(), cell.getValue());
+        }
         ATM banknotes = new ATM();
         if (sum <= 0) {
             System.out.println("Затребованная сумма должна быть больше нуля");
@@ -81,6 +85,7 @@ public class ATM {
                     }
                 }
                 if (sum > 0) {
+                    banknoteCells = banknoteCellsCurrentState;
                     banknotes = new ATM();
                     System.out.println("Невозможно выдать затребованную сумму");
                 }
