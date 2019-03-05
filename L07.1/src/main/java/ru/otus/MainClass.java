@@ -1,10 +1,13 @@
 package ru.otus;
 
+import ru.otus.ATM.ATM;
+import ru.otus.ATM.ATMImpl;
+
 public class MainClass {
 
     public static void main(String[] args) {
 
-        ATM atm = new ATM();
+        ATM atm = new ATMImpl();
         fillAtm(atm);
         System.out.println("Состояние " + atm);
         System.out.println();

@@ -1,14 +1,14 @@
-package ru.otus;
+package ru.otus.ATM;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class ATM {
+public class ATMImpl implements ATM {
 
     private Map<Integer, Integer> banknoteCells;
 
-    public ATM() {
+    public ATMImpl() {
         banknoteCells = new TreeMap<>(Collections.reverseOrder());
         banknoteCells.put(10, 0);
         banknoteCells.put(50, 0);
@@ -20,15 +20,18 @@ public class ATM {
         banknoteCells.put(5000, 0);
     }
 
-    public Map<Integer, Integer> getBanknoteCell() {
+    @Override
+    public Map<Integer, Integer> getBanknoteCells() {
         return banknoteCells;
     }
 
-    private void setBanknoteCell(Map<Integer, Integer> banknoteCells) {
+    @Override
+    public void setBanknoteCells(Map<Integer, Integer> banknoteCells) {
         this.banknoteCells = banknoteCells;
     }
 
-    void putBanknote(Integer banknote) {
+    @Override
+    public void putBanknote(Integer banknote) {
         if (banknoteCells.containsKey(banknote)) {
             banknoteCells.replace(banknote, banknoteCells.get(banknote) + 1);
         } else {
@@ -37,7 +40,8 @@ public class ATM {
 
     }
 
-    private void getBanknote(Integer banknote) {
+    @Override
+    public void getBanknote(Integer banknote) {
         if (banknoteCells.containsKey(banknote)) {
             if (getBanknoteAmount(banknote) > 0) {
                 banknoteCells.replace(banknote, banknoteCells.get(banknote) - 1);
@@ -49,6 +53,7 @@ public class ATM {
         }
     }
 
+    @Override
     public Long getBalance() {
         Long balance= 0L;
         for (Map.Entry<Integer, Integer> cell : banknoteCells.entrySet()) {
@@ -57,6 +62,7 @@ public class ATM {
         return balance;
     }
 
+    @Override
     public Integer getBanknoteAmount(Integer banknote) {
         Integer amount = 0;
         if (banknoteCells.containsKey(banknote)) {
@@ -67,12 +73,13 @@ public class ATM {
         return amount;
     }
 
+    @Override
     public ATM getSum(Integer sum) {
         Map<Integer, Integer> banknoteCellsCurrentState = new TreeMap<>(Collections.reverseOrder());
         for (Map.Entry<Integer, Integer> cell : banknoteCells.entrySet()) {
             banknoteCellsCurrentState.put(cell.getKey(), cell.getValue());
         }
-        ATM banknotes = new ATM();
+        ATM banknotes = new ATMImpl();
         if (sum <= 0) {
             System.out.println("Затребованная сумма должна быть больше нуля");
         } else {
@@ -86,7 +93,7 @@ public class ATM {
                 }
                 if (sum > 0) {
                     banknoteCells = banknoteCellsCurrentState;
-                    banknotes = new ATM();
+                    banknotes = new ATMImpl();
                     System.out.println("Невозможно выдать затребованную сумму");
                 }
             } else {
