@@ -75,11 +75,9 @@ public class ATM {
             if (sum <= getBalance()) {
                 for (Integer key : banknoteCells.keySet()) {
                     while (getBanknoteAmount(key) > 0 && sum >= key) {
-                        if (sum >= key) {
-                            banknotes.putBanknote(key);
-                            getBanknote(key);
-                            sum -= key;
-                        }
+                        getBanknote(key);
+                        banknotes.putBanknote(key);
+                        sum -= key;
                     }
                 }
                 if (sum > 0) {
