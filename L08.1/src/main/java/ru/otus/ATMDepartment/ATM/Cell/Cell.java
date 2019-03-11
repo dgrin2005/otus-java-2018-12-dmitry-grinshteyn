@@ -51,4 +51,8 @@ public class Cell {
     public Cell clone() {
         return new Cell(this.banknoteNominal, this.amount);
     }
+
+    public Integer getAmount() {
+        return amount;
+    }
 }
