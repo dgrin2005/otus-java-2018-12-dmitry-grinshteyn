@@ -4,9 +4,9 @@ import java.lang.ref.SoftReference;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class CacheEngineImpl implements CacheEngine {
+public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
 
-    private Map<Integer, SoftReference<Object>> cache;
+    private Map<K, SoftReference<V>> cache;
     private long hitsCount;
     private long missCount;
     private int maxSize;
@@ -23,19 +23,21 @@ public class CacheEngineImpl implements CacheEngine {
     }
 
     @Override
-    public void put(Integer key, Object o) {
+    public void put(K key, V v) {
         softReferenceEviction();
         maxSizeEviction();
-        cache.put(key, new SoftReference<>(o));
+        cache.put(key, new SoftReference<>(v));
     }
 
     @Override
-    public Object get(Integer key) {
+    public Object get(K key) {
         if (cache.containsKey(key)) {
-            SoftReference<Object> entry = cache.get(key);
+            SoftReference<V> entry = cache.get(key);
             if (entry.get() != null) {
                 hitsCount++;
                 return entry.get();
+            } else {
+                remove(key);
             }
         }
         missCount++;
@@ -43,7 +45,7 @@ public class CacheEngineImpl implements CacheEngine {
     }
 
     @Override
-    public void remove(Integer key) {
+    public void remove(K key) {
         cache.remove(key);
     }
 
@@ -74,13 +76,15 @@ public class CacheEngineImpl implements CacheEngine {
 
     private void maxSizeEviction() {
         if (size() == maxSize) {
-            Integer firstKey = cache.keySet().iterator().next();
+            K firstKey = cache.keySet().iterator().next();
             remove(firstKey);
         }
     }
 
     private void softReferenceEviction() {
-        cache.entrySet().removeIf(e -> e.getValue().get() == null);
+        if (size() == maxSize) {
+            cache.entrySet().removeIf(e -> e.getValue().get() == null);
+        }
     }
 
 }

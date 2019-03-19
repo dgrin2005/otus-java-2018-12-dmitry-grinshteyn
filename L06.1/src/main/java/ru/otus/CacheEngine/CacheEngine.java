@@ -1,12 +1,12 @@
 package ru.otus.CacheEngine;
 
-public interface CacheEngine {
+public interface CacheEngine<K, V> {
 
-    void put(Integer key, Object o);
+    void put(K key, V v);
 
-    Object get(Integer key);
+    Object get(K key);
 
-    void remove(Integer key);
+    void remove(K key);
 
     void removeAll();
 
