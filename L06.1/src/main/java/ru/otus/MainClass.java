@@ -12,14 +12,25 @@ import ru.otus.CacheEngine.CacheException;
 public class MainClass {
 
     public static void main(String[] args) {
-        int amount = 900;
+        int amount = 100;
 
         try {
-            CacheEngine cache = new CacheEngineImpl(1000);
+            CacheEngine cache = new CacheEngineImpl(100);
+            // Заполняем кэш
             for (int i = 0; i < amount; i ++) {
                 cache.put(i, new BigObject(String.valueOf(i)));
             }
-            for (int i = 0; i < amount; i ++) {
+            System.out.println("Обращение к элементам кэша: ");
+            for (int i = 0; i < 10; i ++) {
+                System.out.println(i + " - " + cache.get(i));
+            }
+            System.out.println();
+            // Добавляем в кэш еще объекты
+            for (int i = amount; i < amount + 50; i ++) {
+                cache.put(i, new BigObject(String.valueOf(i)));
+            }
+            System.out.println("Результат: ");
+            for (int i = 0; i < amount + 50; i ++) {
                 System.out.println(i + " - " + cache.get(i));
             }
             System.out.println("Hits = " + cache.getHitsCount());

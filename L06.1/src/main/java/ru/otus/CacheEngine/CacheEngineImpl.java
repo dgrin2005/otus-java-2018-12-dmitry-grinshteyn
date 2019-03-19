@@ -1,12 +1,11 @@
 package ru.otus.CacheEngine;
 
-import java.lang.ref.SoftReference;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
 
-    private Map<K, SoftReference<V>> cache;
+    private Map<K, CacheEngineValue<V>> cache;
     private long hitsCount;
     private long missCount;
     private int maxSize;
@@ -26,16 +25,17 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
     public void put(K key, V v) {
         softReferenceEviction();
         maxSizeEviction();
-        cache.put(key, new SoftReference<>(v));
+        cache.put(key, new CacheEngineValue<>(v));
     }
 
     @Override
     public Object get(K key) {
         if (cache.containsKey(key)) {
-            SoftReference<V> entry = cache.get(key);
-            if (entry.get() != null) {
+            CacheEngineValue<V> entry = cache.get(key);
+            if (entry.getValue().get() != null) {
                 hitsCount++;
-                return entry.get();
+                entry.setAccess();
+                return entry.getValue().get();
             } else {
                 remove(key);
             }
@@ -76,15 +76,36 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
 
     private void maxSizeEviction() {
         if (size() == maxSize) {
-            K firstKey = cache.keySet().iterator().next();
-            remove(firstKey);
+            K firstKey = getFirstAccessKey();
+            if (firstKey != null) {
+                remove(firstKey);
+            }
         }
     }
 
     private void softReferenceEviction() {
         if (size() == maxSize) {
-            cache.entrySet().removeIf(e -> e.getValue().get() == null);
+            cache.entrySet().removeIf(e -> e.getValue().getValue().get() == null);
         }
+    }
+
+    private K getFirstAccessKey() {
+        K key = null;
+        long firstAccessTime = 0;
+        long currentAccessTime = 0;
+        for (Map.Entry<K, CacheEngineValue<V>> entry : cache.entrySet()) {
+            if (key == null) {
+                key = entry.getKey();
+                firstAccessTime = entry.getValue().getLastAccessTime();
+            } else {
+                currentAccessTime = entry.getValue().getLastAccessTime();
+                if (currentAccessTime < firstAccessTime) {
+                    key = entry.getKey();
+                    firstAccessTime = currentAccessTime;
+                }
+            }
+        }
+        return key;
     }
 
 }
