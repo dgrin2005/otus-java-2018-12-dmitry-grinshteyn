@@ -1,17 +1,15 @@
 package ru.otus.CacheEngine;
 
-import java.lang.ref.SoftReference;
-
 public class CacheEngineValue<V> {
-    private SoftReference<V> value;
+    private V value;
     private long lastAccessTime;
 
     public CacheEngineValue(V value) {
-        this.value = new SoftReference<>(value);
+        this.value = value;
         this.lastAccessTime = System.currentTimeMillis();
     }
 
-    public SoftReference<V> getValue() {
+    public V getValue() {
         return value;
     }
 

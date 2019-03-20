@@ -1,11 +1,14 @@
 package ru.otus.CacheEngine;
 
+import java.lang.ref.SoftReference;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
 
-    private Map<K, CacheEngineValue<V>> cache;
+    private Map<K, SoftReference<CacheEngineValue<V>>> cache;
     private long hitsCount;
     private long missCount;
     private int maxSize;
@@ -23,19 +26,18 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
 
     @Override
     public void put(K key, V v) {
-        softReferenceEviction();
-        maxSizeEviction();
-        cache.put(key, new CacheEngineValue<>(v));
+        eviction();
+        cache.put(key, new SoftReference<>(new CacheEngineValue<>(v)));
     }
 
     @Override
     public Object get(K key) {
         if (cache.containsKey(key)) {
-            CacheEngineValue<V> entry = cache.get(key);
-            if (entry.getValue().get() != null) {
+            SoftReference<CacheEngineValue<V>> entry = cache.get(key);
+            if (entry.get() != null) {
                 hitsCount++;
-                entry.setAccess();
-                return entry.getValue().get();
+                entry.get().setAccess();
+                return entry.get().getValue();
             } else {
                 remove(key);
             }
@@ -74,38 +76,15 @@ public class CacheEngineImpl<K, V> implements CacheEngine<K, V> {
         return maxSize;
     }
 
-    private void maxSizeEviction() {
+    private void eviction() {
         if (size() == maxSize) {
-            K firstKey = getFirstAccessKey();
-            if (firstKey != null) {
-                remove(firstKey);
-            }
+            cache.entrySet().removeIf(e -> e.getValue().get() == null);
         }
-    }
-
-    private void softReferenceEviction() {
         if (size() == maxSize) {
-            cache.entrySet().removeIf(e -> e.getValue().getValue().get() == null);
+            cache.entrySet().stream()
+                    .min(Comparator.comparingLong(e -> Objects.isNull(e.getValue())
+                            ? 0 : e.getValue().get().getLastAccessTime())).ifPresent(e -> cache.remove(e.getKey()));
         }
-    }
-
-    private K getFirstAccessKey() {
-        K key = null;
-        long firstAccessTime = 0;
-        long currentAccessTime = 0;
-        for (Map.Entry<K, CacheEngineValue<V>> entry : cache.entrySet()) {
-            if (key == null) {
-                key = entry.getKey();
-                firstAccessTime = entry.getValue().getLastAccessTime();
-            } else {
-                currentAccessTime = entry.getValue().getLastAccessTime();
-                if (currentAccessTime < firstAccessTime) {
-                    key = entry.getKey();
-                    firstAccessTime = currentAccessTime;
-                }
-            }
-        }
-        return key;
     }
 
 }
