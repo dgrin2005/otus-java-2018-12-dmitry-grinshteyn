@@ -71,6 +71,15 @@ public class MainClass {
         innerTestClassArray[2] = new InnerTestClass(true, "ccc", 3.);
         testJSONObjectWriter(innerTestClassArray);
 
+        TestClassExtended testClassExtended = new TestClassExtended(
+                123,
+                "123",
+                new InnerTestClass(true, "456", 10.),
+                innerTestClassDoubleMap,
+                5,
+                6);
+        testJSONObjectWriter(testClassExtended);
+
         HashSet<InnerTestClass> innerTestClassHashSet = new HashSet<>();
         innerTestClassHashSet.add(new InnerTestClass(true, "aaa", 1.));
         innerTestClassHashSet.add(new InnerTestClass(false, "bbb", 2.));

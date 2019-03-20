@@ -53,12 +53,20 @@ public class JSONObjectWriter {
             }
             return jsonObject;
         }
-        Field[] fs = objectClass.getDeclaredFields();
+        List<Field> fs = getAllFields(objectClass);
         for (Field field : fs) {
             field.setAccessible(true);
             jsonObject.put(field.getName(), writeToJSON(field.get(object)));
         }
         return jsonObject;
+    }
+
+    private List<Field> getAllFields(Class<?> objectClass) {
+        List<Field> fields = new ArrayList<>(Arrays.asList(objectClass.getDeclaredFields()));
+        if (objectClass.getSuperclass() != null) {
+            fields.addAll(getAllFields(objectClass.getSuperclass()));
+        }
+        return fields;
     }
 
 }
