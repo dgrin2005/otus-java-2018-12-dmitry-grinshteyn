@@ -1,4 +1,4 @@
-package ru.otus;
+package ru.otus.JSON;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

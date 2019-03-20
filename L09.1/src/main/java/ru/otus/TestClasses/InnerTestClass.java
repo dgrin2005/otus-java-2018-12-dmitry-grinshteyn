@@ -1,4 +1,4 @@
-package ru.otus;
+package ru.otus.TestClasses;
 
 public class InnerTestClass {
     private boolean x;

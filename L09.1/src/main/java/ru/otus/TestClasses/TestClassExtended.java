@@ -1,4 +1,4 @@
-package ru.otus;
+package ru.otus.TestClasses;
 
 import java.util.Map;
 

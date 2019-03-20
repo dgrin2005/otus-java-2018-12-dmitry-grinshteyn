@@ -1,6 +1,10 @@
 package ru.otus;
 
 import com.google.gson.Gson;
+import ru.otus.JSON.JSONObjectWriter;
+import ru.otus.TestClasses.InnerTestClass;
+import ru.otus.TestClasses.TestClass;
+import ru.otus.TestClasses.TestClassExtended;
 
 import java.util.*;
 
