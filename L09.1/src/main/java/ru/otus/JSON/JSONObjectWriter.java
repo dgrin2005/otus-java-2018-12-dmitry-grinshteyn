@@ -19,39 +19,25 @@ public class JSONObjectWriter {
                 objectClass == Float.class || objectClass == Double.class || objectClass == String.class) {
                     return object;
         }
+        if (isImplementedInterface(objectClass, Collection.class)) {
+            JSONArray jsonArray = new JSONArray();
+            for (Object o : (Collection)object) {
+                jsonArray.add(writeToJSON(o));
+            }
+            return jsonArray;
+        }
+        if (isImplementedInterface(objectClass, Map.class)) {
+            for (Map.Entry<Object, Object> entry: ((Map<Object, Object>)object).entrySet()) {
+                jsonObject.put(entry.getKey(), writeToJSON(entry.getValue()));
+            }
+            return jsonObject;
+        }
         if (objectClass.isArray()) {
             JSONArray jsonArray = new JSONArray();
             for (Object o : (Object[]) object) {
                 jsonArray.add(writeToJSON(o));
             }
             return jsonArray;
-        }
-        if (Arrays.stream(objectClass.getInterfaces()).anyMatch(i -> i.equals(List.class))) {
-            JSONArray jsonArray = new JSONArray();
-            for (Object o : (List)object) {
-                jsonArray.add(writeToJSON(o));
-            }
-            return jsonArray;
-        }
-        if (Arrays.stream(objectClass.getInterfaces()).anyMatch(i -> i.equals(Set.class))) {
-            JSONArray jsonArray = new JSONArray();
-            for (Object o : (Set)object) {
-                jsonArray.add(writeToJSON(o));
-            }
-            return jsonArray;
-        }
-        if (objectClass == PriorityQueue.class) {
-            JSONArray jsonArray = new JSONArray();
-            for (Object o : (Queue)object) {
-                jsonArray.add(writeToJSON(o));
-            }
-            return jsonArray;
-        }
-        if (Arrays.stream(objectClass.getInterfaces()).anyMatch(i -> i.equals(Map.class))) {
-            for (Map.Entry<Object, Object> entry: ((Map<Object, Object>)object).entrySet()) {
-                jsonObject.put(entry.getKey(), writeToJSON(entry.getValue()));
-            }
-            return jsonObject;
         }
         List<Field> fs = getAllFields(objectClass);
         for (Field field : fs) {
@@ -67,6 +53,18 @@ public class JSONObjectWriter {
             fields.addAll(getAllFields(objectClass.getSuperclass()));
         }
         return fields;
+    }
+
+    private boolean isImplementedInterface(Class<?> objectClass, Class<?> interfaceClass) {
+        if (!Arrays.stream(objectClass.getInterfaces()).anyMatch(i -> i.equals(interfaceClass))) {
+            if (objectClass.getSuperclass() != null) {
+                return isImplementedInterface(objectClass.getSuperclass(), interfaceClass);
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
     }
 
 }
