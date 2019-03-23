@@ -47,7 +47,7 @@ public class MainClass {
         HashMap<Integer, Integer> hashMap = new HashMap<>();
         hashMap.put(1, 10);
         hashMap.put(2, 20);
-        hashMap.put(3, 30);
+        hashMap.put(3, null);
         hashMap.put(4, 40);
         hashMap.put(5, 50);
         testJSONObjectWriter(hashMap);
@@ -89,12 +89,18 @@ public class MainClass {
         innerTestClassHashSet.add(new InnerTestClass(false, "bbb", 2.));
         innerTestClassHashSet.add(new InnerTestClass(true, "ccc", 3.));
         testJSONObjectWriter(innerTestClassHashSet);
+
+        testJSONObjectWriter(null);
+
+        testJSONObjectWriter(new int[] {1, 2, 3, 4, 5});
+
+        testJSONObjectWriter(new TestClass(1, "aaa", null, null));
     }
 
     static void testJSONObjectWriter(Object object) throws IllegalAccessException {
         Gson gson = new Gson();
         JSONObjectWriter jsonObjectWriter = new JSONObjectWriter();
-        System.out.println(object.getClass());
+        System.out.println((object == null) ? null : object.getClass());
         System.out.println("JSON ObjectWriter : " + jsonObjectWriter.writeToJSON(object));
         System.out.println("GSON              : " + gson.toJson(object));
         System.out.println();

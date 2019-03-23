@@ -3,14 +3,17 @@ package ru.otus.JSON;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.*;
 
 public class JSONObjectWriter {
 
     public Object writeToJSON(Object object) throws IllegalAccessException {
+        if (object == null) {
+            return null;
+        }
         JSONObject jsonObject = new JSONObject();
-
         Class<?> objectClass = object.getClass();
 
         if (objectClass.isPrimitive() || objectClass == Integer.class || objectClass == Long.class ||
@@ -28,21 +31,28 @@ public class JSONObjectWriter {
         }
         if (isImplementedInterface(objectClass, Map.class)) {
             for (Map.Entry<Object, Object> entry: ((Map<Object, Object>)object).entrySet()) {
-                jsonObject.put(entry.getKey(), writeToJSON(entry.getValue()));
+                Object o = writeToJSON(entry.getValue());
+                if (o != null) {
+                    jsonObject.put(entry.getKey(), o);
+                }
             }
             return jsonObject;
         }
         if (objectClass.isArray()) {
             JSONArray jsonArray = new JSONArray();
-            for (Object o : (Object[]) object) {
-                jsonArray.add(writeToJSON(o));
+            int arrayLength = Array.getLength(object);
+            for(int i = 0; i < arrayLength; i++){
+                jsonArray.add(writeToJSON(Array.get(object, i)));
             }
             return jsonArray;
         }
         List<Field> fs = getAllFields(objectClass);
         for (Field field : fs) {
             field.setAccessible(true);
-            jsonObject.put(field.getName(), writeToJSON(field.get(object)));
+            Object o = writeToJSON(field.get(object));
+            if (o != null) {
+                jsonObject.put(field.getName(), o);
+            }
         }
         return jsonObject;
     }
