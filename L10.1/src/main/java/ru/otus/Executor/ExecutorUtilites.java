@@ -50,7 +50,7 @@ class ExecutorUtilites {
         List<Field> fields = getAllFields(t);
         if (fields.size() > 0) {
             String queryStringPart1 = fields.stream().map(Field::getName)
-                    .collect(Collectors.joining(", ", "INSERT INTO " + DBUtilites.getTable() + " (", ")"));
+                    .collect(Collectors.joining(", ", "INSERT INTO " + DBUtilites.getTable(t) + " (", ")"));
             String queryStringPart2 = fields.stream().map(x -> "?")
                     .collect(Collectors.joining(", ", " VALUES (", ")"));
             return queryStringPart1 + queryStringPart2;
@@ -62,7 +62,7 @@ class ExecutorUtilites {
         List<Field> fields = getAllFields(t);
         if (fields.size() > 0) {
             return fields.stream().map(Field::getName)
-                    .collect(Collectors.joining(", ", "SELECT ", " FROM " + DBUtilites.getTable() + " WHERE id = ?"));
+                    .collect(Collectors.joining(", ", "SELECT ", " FROM " + DBUtilites.getTable(t) + " WHERE id = ?"));
         }
         return "";
     }
@@ -71,7 +71,7 @@ class ExecutorUtilites {
         List<Field> fields = getAllFields(t);
         if (fields.size() > 0) {
             return fields.stream().map(Field::getName)
-                    .collect(Collectors.joining(", ", "SELECT ", " FROM " + DBUtilites.getTable()));
+                    .collect(Collectors.joining(", ", "SELECT ", " FROM " + DBUtilites.getTable(t)));
         }
         return "";
     }
@@ -80,27 +80,23 @@ class ExecutorUtilites {
         List<Field> fields = getAllFields(t);
         if (fields.size() > 0) {
             return fields.stream().map(x -> x.getName() + " = ?")
-                    .collect(Collectors.joining(", ", "UPDATE " + DBUtilites.getTable() + " SET ", " WHERE id = ?"));
+                    .collect(Collectors.joining(", ", "UPDATE " + DBUtilites.getTable(t) + " SET ", " WHERE id = ?"));
         }
         return "";
     }
 
-    static String getDeleteByIdQuery() {
-        return "DELETE FROM " + DBUtilites.getTable() + " WHERE id = ?";
+    static <T> String getDeleteByIdQuery(Class<T> t) {
+        return "DELETE FROM " + DBUtilites.getTable(t) + " WHERE id = ?";
     }
 
-    static String getDeleteAllQuery() {
-        return "DELETE FROM " + DBUtilites.getTable();
+    static <T> String getDeleteAllQuery(Class<T> t) {
+        return "DELETE FROM " + DBUtilites.getTable(t);
     }
 
-    static <T> void fillQueryParameters(PreparedStatement preparedStatement, List<Field> fields, T t) throws SQLException {
+    static <T> void fillQueryParameters(PreparedStatement preparedStatement, List<Field> fields, T t) throws SQLException, IllegalAccessException {
         for (int i = 0; i < fields.size(); i++) {
             fields.get(i).setAccessible(true);
-            try {
-                preparedStatement.setObject(i + 1, fields.get(i).get(t));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            preparedStatement.setObject(i + 1, fields.get(i).get(t));
         }
     }
 

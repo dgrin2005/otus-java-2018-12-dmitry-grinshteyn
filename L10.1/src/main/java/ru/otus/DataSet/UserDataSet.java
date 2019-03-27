@@ -1,5 +1,8 @@
 package ru.otus.DataSet;
 
+import ru.otus.Annotation.TableName;
+
+@TableName("otus.hw10")
 public class UserDataSet extends DataSet {
     private String name;
     private int age;

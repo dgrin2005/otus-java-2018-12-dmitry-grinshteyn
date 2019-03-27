@@ -1,6 +1,7 @@
 package ru.otus.DAO;
 
 import ru.otus.DataSet.DataSet;
+import ru.otus.Exception.MyOrmException;
 import ru.otus.Executor.Executor;
 
 import java.sql.Connection;
@@ -15,12 +16,12 @@ public class DataSetDAOImpl implements DataSetDAO {
     }
 
     @Override
-    public <T extends DataSet> void create(T t) {
-        Executor.save(connection, t);
+    public <T extends DataSet> T create(T t) throws MyOrmException {
+        return Executor.save(connection, t);
     }
 
     @Override
-    public <T extends DataSet> T getById(long id, Class<T> t) {
+    public <T extends DataSet> T getById(long id, Class<T> t) throws MyOrmException {
         return Executor.load(connection, id, t);
     }
 
@@ -29,17 +30,17 @@ public class DataSetDAOImpl implements DataSetDAO {
         return Executor.loadAll(connection, t);
     }
 
-    public void deleteById(long id) {
-        Executor.deleteById(connection, id);
+    public <T extends DataSet> void deleteById(long id, Class<T> t) throws MyOrmException {
+        Executor.deleteById(connection, t, id);
     }
 
     @Override
-    public void deleteAll() {
-        Executor.deleteAll(connection);
+    public <T extends DataSet> void deleteAll(Class<T> t) throws MyOrmException {
+        Executor.deleteAll(connection, t);
     }
 
     @Override
-    public <T extends DataSet> void update(T t) {
-        Executor.update(connection, t);
+    public <T extends DataSet> T update(T t) throws MyOrmException {
+        return Executor.update(connection, t);
     }
 }

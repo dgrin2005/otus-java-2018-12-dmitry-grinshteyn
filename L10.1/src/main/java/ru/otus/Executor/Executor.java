@@ -1,6 +1,7 @@
 package ru.otus.Executor;
 
 import ru.otus.DataSet.DataSet;
+import ru.otus.Exception.MyOrmException;
 
 import java.lang.reflect.Field;
 import java.sql.*;
@@ -10,20 +11,29 @@ import static ru.otus.Executor.ExecutorUtilites.*;
 
 public class Executor {
 
-    public static <T extends DataSet> void save(Connection connection, T t) {
+    public static <T extends DataSet> T save(Connection connection, T t) throws MyOrmException {
         String queryString = getSaveQuery(t.getClass());
         if (!queryString.isEmpty()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(queryString)){
+            try (PreparedStatement preparedStatement = connection.prepareStatement(queryString, Statement.RETURN_GENERATED_KEYS)){
                 List<Field> fields = getAllFields(t.getClass());
                 fillQueryParameters(preparedStatement, fields, t);
                 preparedStatement.executeUpdate();
+                ResultSet resultSet = preparedStatement.getGeneratedKeys();
+                if (resultSet.next()) {
+                    long newId = resultSet.getLong(1);
+                    t.setId(newId);
+                    return t;
+                }
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new MyOrmException(e.getMessage());
+            } catch (IllegalAccessException e) {
+                throw new MyOrmException(e.getMessage());
             }
         }
+        return null;
     }
 
-    public static <T extends DataSet> T load(Connection connection, long id, Class<T> t) {
+    public static <T extends DataSet> T load(Connection connection, long id, Class<T> t) throws MyOrmException {
         String queryString = getLoadQuery(t);
         if (!queryString.isEmpty()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(queryString)){
@@ -31,7 +41,7 @@ public class Executor {
                 ResultSet resultSet = preparedStatement.executeQuery();
                 return extract(resultSet, t);
             } catch (SQLException | IllegalAccessException | InstantiationException e) {
-                e.printStackTrace();
+                throw new MyOrmException(e.getMessage());
             }
         }
         return null;
@@ -50,7 +60,7 @@ public class Executor {
         return null;
     }
 
-    public static <T extends DataSet> void update(Connection connection, T t) {
+    public static <T extends DataSet> T update(Connection connection, T t) throws MyOrmException {
         String queryString = getUpdateQuery(t.getClass());
         if (!queryString.isEmpty()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(queryString)){
@@ -58,31 +68,35 @@ public class Executor {
                 fillQueryParameters(preparedStatement, fields, t);
                 preparedStatement.setLong(fields.size() + 1, t.getId());
                 preparedStatement.executeUpdate();
+                return (T)load(connection, t.getId(), t.getClass());
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new MyOrmException(e.getMessage());
+            } catch (IllegalAccessException e) {
+                throw new MyOrmException(e.getMessage());
             }
         }
+        return null;
     }
 
-    public static void deleteById(Connection connection, long id) {
-        String queryString = getDeleteByIdQuery();
+    public static <T extends DataSet> void deleteById(Connection connection, Class<T> t, long id) throws MyOrmException {
+        String queryString = getDeleteByIdQuery(t);
         if (!queryString.isEmpty()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(queryString)){
                 preparedStatement.setLong(1, id);
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new MyOrmException(e.getMessage());
             }
         }
     }
 
-    public static void deleteAll(Connection connection) {
-        String queryString = getDeleteAllQuery();
+    public static <T extends DataSet> void deleteAll(Connection connection, Class<T> t) throws MyOrmException {
+        String queryString = getDeleteAllQuery(t);
         if (!queryString.isEmpty()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(queryString)){
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new MyOrmException(e.getMessage());
             }
         }
     }
