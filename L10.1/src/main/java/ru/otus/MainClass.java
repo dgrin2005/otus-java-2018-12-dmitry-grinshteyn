@@ -33,7 +33,7 @@ public class MainClass {
             System.out.println(dao.getAll(UserDataSet.class));
             dao.deleteAll(UserDataSet.class);
         } catch (SQLException e) {
-            throw new MyOrmException(e.getMessage());
+            throw new MyOrmException(e);
         }
     }
 

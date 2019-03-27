@@ -25,9 +25,9 @@ public class Executor {
                     return t;
                 }
             } catch (SQLException e) {
-                throw new MyOrmException(e.getMessage());
+                throw new MyOrmException(e);
             } catch (IllegalAccessException e) {
-                throw new MyOrmException(e.getMessage());
+                throw new MyOrmException(e);
             }
         }
         return null;
@@ -41,7 +41,7 @@ public class Executor {
                 ResultSet resultSet = preparedStatement.executeQuery();
                 return extract(resultSet, t);
             } catch (SQLException | IllegalAccessException | InstantiationException e) {
-                throw new MyOrmException(e.getMessage());
+                throw new MyOrmException(e);
             }
         }
         return null;
@@ -70,9 +70,9 @@ public class Executor {
                 preparedStatement.executeUpdate();
                 return (T)load(connection, t.getId(), t.getClass());
             } catch (SQLException e) {
-                throw new MyOrmException(e.getMessage());
+                throw new MyOrmException(e);
             } catch (IllegalAccessException e) {
-                throw new MyOrmException(e.getMessage());
+                throw new MyOrmException(e);
             }
         }
         return null;
@@ -85,7 +85,7 @@ public class Executor {
                 preparedStatement.setLong(1, id);
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
-                throw new MyOrmException(e.getMessage());
+                throw new MyOrmException(e);
             }
         }
     }
@@ -96,7 +96,7 @@ public class Executor {
             try (PreparedStatement preparedStatement = connection.prepareStatement(queryString)){
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
-                throw new MyOrmException(e.getMessage());
+                throw new MyOrmException(e);
             }
         }
     }
