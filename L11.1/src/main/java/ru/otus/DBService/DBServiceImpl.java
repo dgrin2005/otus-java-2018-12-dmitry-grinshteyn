@@ -1,4 +1,4 @@
-package ru.otus;
+package ru.otus.DBService;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -33,9 +33,7 @@ public class DBServiceImpl implements DBService, AutoCloseable {
         configuration.setProperty("hibernate.connection.allowPublicKeyRetrieval", "true");
         configuration.setProperty("hibernate.connection.useLegacyDatetimeCode", "false");
         configuration.setProperty("hibernate.connection.serverTimezone", "UTC");
-
         configuration.setProperty("hibernate.enable_lazy_load_no_trans", "true");
-
         sessionFactory = createSessionFactory(configuration);
     }
 

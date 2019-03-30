@@ -1,10 +1,7 @@
 package ru.otus.DataSet;
 
-import ru.otus.Annotation.TableName;
-
 import javax.persistence.*;
 
-//@TableName("otus.hw10")
 @Entity
 @Table
 public class UserDataSet extends DataSet {

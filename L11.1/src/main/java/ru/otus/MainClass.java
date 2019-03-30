@@ -1,5 +1,7 @@
 package ru.otus;
 
+import ru.otus.DBService.DBService;
+import ru.otus.DBService.DBServiceImpl;
 import ru.otus.DataSet.UserDataSet;
 import ru.otus.Exception.MyOrmException;
 
