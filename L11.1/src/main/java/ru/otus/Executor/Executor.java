@@ -5,10 +5,7 @@ import ru.otus.DataSet.DataSet;
 import ru.otus.Exception.MyOrmException;
 
 import javax.persistence.criteria.*;
-import java.lang.reflect.Field;
 import java.util.List;
-
-import static ru.otus.Executor.ExecutorUtilites.*;
 
 public class Executor {
 
@@ -30,22 +27,9 @@ public class Executor {
         return session.createQuery(criteria).list();
     }
 
-    public static <T extends DataSet> T update(Session session, CriteriaBuilder builder, T t) throws MyOrmException {
-        Class aClass = t.getClass();
-        CriteriaUpdate<T> criteria = builder.createCriteriaUpdate(aClass);
-        Root from = criteria.from(aClass);
-        List<Field> fields = getAllFields(t.getClass());
-        for(Field field : fields) {
-            field.setAccessible(true);
-            try {
-                criteria.set(field.getName(), field.get(t));
-            } catch (IllegalAccessException e) {
-                throw new MyOrmException(e.getMessage(), e);
-            }
-        }
-        criteria.where(builder.equal(from.get("id"), t.getId()));
-        session.createQuery(criteria).executeUpdate();
-        return (T) load(session, builder, t.getId(), (Class<DataSet>) aClass);
+    public static <T extends DataSet> T update(Session session, T t) throws MyOrmException {
+        session.update(t);
+        return t;
     }
 
     public static <T extends DataSet> void deleteById(Session session, CriteriaBuilder builder, Class<T> t, long id) throws MyOrmException {
@@ -60,4 +44,6 @@ public class Executor {
         criteria.from(t);
         session.createQuery(criteria).executeUpdate();
     }
+
+
 }

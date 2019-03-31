@@ -17,17 +17,19 @@ public class DBServiceImpl implements DBService, AutoCloseable {
 
     private final SessionFactory sessionFactory;
 
-    public <T extends DataSet> DBServiceImpl(Class<T> t) {
+    public DBServiceImpl(List<Class<? extends DataSet>> classes) {
         Configuration configuration = new Configuration();
 
-        configuration.addAnnotatedClass(t);
+        for(Class<? extends DataSet> t : classes) {
+            configuration.addAnnotatedClass(t);
+        }
 
         configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
         configuration.setProperty("hibernate.connection.driver_class", "com.mysql.cj.jdbc.Driver");
         configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/otus");
         configuration.setProperty("hibernate.connection.username", "root");
         configuration.setProperty("hibernate.connection.password", "123A321");
-        configuration.setProperty("hibernate.show_sql", "true");
+        configuration.setProperty("hibernate.show_sql", "false");
         configuration.setProperty("hibernate.hbm2ddl.auto", "create");
         configuration.setProperty("hibernate.connection.useSSL", "false");
         configuration.setProperty("hibernate.connection.allowPublicKeyRetrieval", "true");

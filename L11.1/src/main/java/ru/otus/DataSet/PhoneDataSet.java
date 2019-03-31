@@ -1,10 +1,9 @@
 package ru.otus.DataSet;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table
+@Table(name = "phone")
 public class PhoneDataSet extends DataSet {
     private String number;
 

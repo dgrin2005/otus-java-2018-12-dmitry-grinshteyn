@@ -39,7 +39,6 @@ public class DataSetDAOImpl implements DataSetDAO {
         Executor.deleteById(session, builder, t, id);
     }
 
-
     @Override
     public <T extends DataSet> void deleteAll(Class<T> t) throws MyOrmException {
         Executor.deleteAll(session, builder, t);
@@ -47,6 +46,6 @@ public class DataSetDAOImpl implements DataSetDAO {
 
     @Override
     public <T extends DataSet> T update(T t) throws MyOrmException {
-        return Executor.update(session, builder, t);
+        return Executor.update(session, t);
     }
 }
