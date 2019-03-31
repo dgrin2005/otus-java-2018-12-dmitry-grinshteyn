@@ -1,10 +1,14 @@
 package ru.otus.DataSet;
 
+import ru.otus.Annotation.MyOrmTable;
+import ru.otus.Annotation.MyOrmTransient;
+
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "user")
+@Table(name = "user_hbr")
+@MyOrmTable("user_my_orm")
 public class UserDataSet extends DataSet {
     private String name;
     private int age;
@@ -15,6 +19,7 @@ public class UserDataSet extends DataSet {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", nullable = false)
+    @MyOrmTransient
     private List<PhoneDataSet> phones;
 
     public UserDataSet() {
@@ -63,7 +68,8 @@ public class UserDataSet extends DataSet {
     @Override
     public String toString() {
         return "\nUserDataSet{" +
-                "name='" + name + '\'' +
+                "id=" + getId() +
+                ", name='" + name + '\'' +
                 ", age=" + age +
                 ", address=" + address +
                 ", phones=" + phones +

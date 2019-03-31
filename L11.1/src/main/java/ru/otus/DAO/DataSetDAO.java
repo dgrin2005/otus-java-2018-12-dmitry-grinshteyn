@@ -11,7 +11,7 @@ public interface DataSetDAO {
 
     <T extends DataSet> T getById(long id, Class<T> t) throws MyOrmException;
 
-    <T extends DataSet> List<T> getAll(Class<T> t);
+    <T extends DataSet> List<T> getAll(Class<T> t) throws MyOrmException;
 
     <T extends DataSet> void deleteById(long id, Class<T> t) throws MyOrmException;
 

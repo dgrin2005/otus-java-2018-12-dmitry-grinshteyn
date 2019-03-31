@@ -1,9 +1,12 @@
 package ru.otus.DataSet;
 
+import ru.otus.Annotation.MyOrmTable;
+
 import javax.persistence.*;
 
 @Entity
-@Table(name = "phone")
+@Table(name = "phone_hbr")
+@MyOrmTable("phone_my_orm")
 public class PhoneDataSet extends DataSet {
     private String number;
 
@@ -26,7 +29,8 @@ public class PhoneDataSet extends DataSet {
     @Override
     public String toString() {
         return "PhoneDataSet{" +
-                "number='" + number + '\'' +
+                "id=" + getId() +
+                ", number='" + number + '\'' +
                 '}';
     }
 }
