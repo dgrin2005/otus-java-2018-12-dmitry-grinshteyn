@@ -43,6 +43,9 @@ public class MainClass {
             user1 = dbService.getById(1, UserDataSet.class);
             System.out.println("user1 = " + user1);
             if (user1 != null) {
+                for (PhoneDataSet phone : user1.getPhones()) {
+                    dbService.deleteById(phone.getId(), PhoneDataSet.class);
+                }
                 user1.setName("Maria");
                 user1.setAddress(new AddressDataSet("Mendeleeva"));
                 user1.setPhones(Arrays.asList(new PhoneDataSet("12345"), new PhoneDataSet("54321")));
