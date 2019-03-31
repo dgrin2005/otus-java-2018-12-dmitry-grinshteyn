@@ -1,6 +1,5 @@
 package ru.otus.Executor;
 
-import org.hibernate.Filter;
 import org.hibernate.Session;
 import ru.otus.DataSet.DataSet;
 import ru.otus.Exception.MyOrmException;
@@ -49,26 +48,6 @@ public class Executor {
         criteria.from(t);
         session.createQuery(criteria).executeUpdate();
     }
-
-    /*public static <T extends DataSet> T save(Connection connection, T t) throws MyOrmException {
-        String queryString = getSaveQuery(t.getClass());
-        if (!queryString.isEmpty()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(queryString, Statement.RETURN_GENERATED_KEYS)){
-                List<Field> fields = getAllFields(t.getClass());
-                fillQueryParameters(preparedStatement, fields, t);
-                preparedStatement.executeUpdate();
-                ResultSet resultSet = preparedStatement.getGeneratedKeys();
-                if (resultSet.next()) {
-                    long newId = resultSet.getLong(1);
-                    t.setId(newId);
-                    return t;
-                }
-            } catch (SQLException | IllegalAccessException e) {
-                throw new MyOrmException(e.getMessage(), e);
-            }
-        }
-        return null;
-    }*/
 
     public static <T extends DataSet> T save(Connection connection, T t) throws MyOrmException {
         String queryString = getSaveQuery(t.getClass());
