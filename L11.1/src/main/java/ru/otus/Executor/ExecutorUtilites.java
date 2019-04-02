@@ -16,9 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class ExecutorUtilites {
+public class ExecutorUtilites {
 
-    static List<Field> getAllFields(Class<?> objectClass) {
+    public static List<Field> getAllFields(Class<?> objectClass) {
         List<Field> fields = Arrays.stream(objectClass.getDeclaredFields())
                 .filter(x -> !x.isAnnotationPresent(MyOrmTransient.class))
                 .collect(Collectors.toList());
@@ -132,7 +132,7 @@ class ExecutorUtilites {
         }
     }
 
-    private static String getTable(Class t) {
+    public static String getTable(Class t) {
         if (t.isAnnotationPresent(MyOrmTable.class)) {
             return ((MyOrmTable)t.getAnnotation(MyOrmTable.class)).value();
         } else {

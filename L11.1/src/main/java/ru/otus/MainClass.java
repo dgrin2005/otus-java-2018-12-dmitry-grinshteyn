@@ -2,7 +2,7 @@ package ru.otus;
 
 import ru.otus.DBService.DBService;
 import ru.otus.DBService.DBServiceHibernateImpl;
-import ru.otus.DBService.DBServiceImpl;
+import ru.otus.DBService.DBServiceMyOrmImpl;
 import ru.otus.DataSet.AddressDataSet;
 import ru.otus.DataSet.PhoneDataSet;
 import ru.otus.DataSet.UserDataSet;
@@ -14,7 +14,9 @@ public class MainClass {
     public static void main(String[] args) throws MyOrmException {
 
         System.out.println("MY ORM");
-        try (DBService dbService = new DBServiceImpl()){
+        try (DBService dbService = new DBServiceMyOrmImpl("otus",
+                UserDataSet.class,
+                AddressDataSet.class)){
             workWithDB(dbService);
         } catch (Exception e) {
             throw new MyOrmException(e.getMessage(), e);
@@ -23,10 +25,10 @@ public class MainClass {
         System.out.println();
 
         System.out.println("HIBERNATE");
-        try (DBService dbService = new DBServiceHibernateImpl(Arrays.asList(
+        try (DBService dbService = new DBServiceHibernateImpl("hibernate.cfg.xml",
                 AddressDataSet.class,
                 PhoneDataSet.class,
-                UserDataSet.class))){
+                UserDataSet.class)){
             workWithDB(dbService);
         } catch (Exception e) {
             throw new MyOrmException(e.getMessage(), e);
@@ -39,7 +41,7 @@ public class MainClass {
         AddressDataSet address2 = new AddressDataSet("Kirova");
         AddressDataSet address3 = new AddressDataSet("Truda");
         AddressDataSet address4 = new AddressDataSet("Mendeleeva");
-        if (dbService instanceof DBServiceImpl) {
+        if (dbService instanceof DBServiceMyOrmImpl) {
             System.out.println("Creating addresses...");
             address1 = dbService.create(address1);
             address2 = dbService.create(address2);
