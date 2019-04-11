@@ -12,7 +12,13 @@ import static ru.otus.WebServer.WebServerUtilites.*;
 
 public class WebServer {
 
-    public void start(DBService dbService) throws Exception {
+    private DBService dbService;
+
+    public WebServer(DBService dbService) {
+        this.dbService = dbService;
+    }
+
+    public void start() throws Exception {
 
         ResourceHandler resourceHandler = new ResourceHandler();
         Resource resource = Resource.newClassPathResource(STATIC_PATH_RESOURCE);

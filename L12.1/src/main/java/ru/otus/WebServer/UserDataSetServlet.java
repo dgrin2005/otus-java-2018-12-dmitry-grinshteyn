@@ -1,8 +1,10 @@
 package ru.otus.WebServer;
 
 import ru.otus.DBService.DBService;
+import ru.otus.DataSet.UserDataSet;
+import ru.otus.Exception.MyOrmException;
+import ru.otus.WebServer.Dto.UserDataSetDto;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,16 +19,24 @@ public class UserDataSetServlet extends HttpServlet {
     private final DBService dbService;
     private final TemplateProcessor templateProcessor;
     private String errorMessage;
+    private long userId;
+    private String userFoundedById;
+    private List<UserDataSetDto> userList;
 
     UserDataSetServlet(DBService dbService) throws IOException {
         this.templateProcessor = new TemplateProcessor();
         this.dbService = dbService;
         this.errorMessage = "";
+        this.userFoundedById = "";
+        this.userId = 0;
+        this.userList = new ArrayList<>();
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Map<String, Object> pageVariables = preparePageVariables(req.getParameterMap(), dbService, errorMessage);
+        userId = getUserIdFromRequest(req);
+        doAction(getAction(req));
+        Map<String, Object> pageVariables = pageVariablesForUsersList(userList, userId, userFoundedById, errorMessage);
         resp.setContentType("text/html;charset=utf-8");
         resp.getWriter().println(templateProcessor.getPage(PAGE_TEMPLATE, pageVariables));
         resp.setStatus(HttpServletResponse.SC_OK);
@@ -34,87 +44,65 @@ public class UserDataSetServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        errorMessage = createNewUser(req.getParameterMap(), dbService);
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        actionCreateNewUser(req);
         doGet(req, resp);
     }
 
-    /*private Map<String, Object> preparePageVariables(Map<String, String[]> parameterMap) {
-        String action = getParameterFromMap(parameterMap, "action");
-        String userId = getParameterFromMap(parameterMap, "id");
-        Map<String, Object> pageVariables = new HashMap<>();
-        List<UserDataSetDto> userList = new ArrayList<>();
-        long userAmount = 0;
-        String userById = "";
-        long id = -1;
-            try {
-                if (!userId.isEmpty()) {
-                    id = Long.valueOf(userId);
-                }
-                userList = dbService.getAll(UserDataSet.class).stream()
-                        .map(UserDataSet::from)
-                        .collect(Collectors.toList());
-                userAmount = dbService.count(UserDataSet.class);
-                if (!action.isEmpty()) {
-                    if (action.equals("delete")) {
-                        dbService.deleteById(id, UserDataSet.class);
-                        userList = dbService.getAll(UserDataSet.class).stream()
-                                .map(UserDataSet::from)
-                                .collect(Collectors.toList());
-                        userAmount = dbService.count(UserDataSet.class);
-                        id = -1;
-                    }
-                } else {
-                    if (id != -1) {
-                        userById = dbService.getById(id, UserDataSet.class).from().toString();
-                    }
-                }
-            } catch (Exception e) {
-                userAmount = userList.size();
-                userById = "";
-                errorMessage = e.getMessage();
-                id = -1;
-            }
-        pageVariables.put("users", userList);
-        pageVariables.put("useramount", userAmount);
-        pageVariables.put("userid", id);
-        pageVariables.put("userbyid", userById);
-        pageVariables.put("errormessage", errorMessage);
-        return pageVariables;
-    }
-
-    private void createNewUser(Map<String, String[]> parameterMap) {
-        String name = getParameterFromMap(parameterMap, "name");
-        String age = getParameterFromMap(parameterMap, "age");
-        String address = getParameterFromMap(parameterMap, "address");
-        String phone = getParameterFromMap(parameterMap, "phone");
-        errorMessage = "";
-        if(!name.isEmpty() && !age.isEmpty()) {
-            try {
-                if (!address.isEmpty()) {
-                    if (!phone.isEmpty()) {
-                        dbService.create(new UserDataSet(name, Integer.valueOf(age),
-                                new AddressDataSet(address), Collections.singletonList(new PhoneDataSet(phone))));
-                    } else {
-                        dbService.create(new UserDataSet(name, Integer.valueOf(age),
-                                new AddressDataSet(address), new ArrayList<>()));
-                    }
-                } else {
-                    dbService.create(new UserDataSet(name, Integer.valueOf(age)));
-                }
-            } catch (MyOrmException e) {
-                errorMessage = e.getMessage();
+    private void doAction(String action) {
+        userFoundedById = "";
+        if (!action.isEmpty() && userId > 0) {
+            if (action.equals(PARAMETER_ACTION_VALUE_DELETE)) {
+                actionDeleteUser();
             }
         } else {
-            errorMessage = "Не все реквизиты заполнены";
+            if (userId > 0) {
+                actionFindUser();
+            } else {
+                userId = -1;
+            }
+        }
+        actionUserList();
+    }
+
+    private void actionCreateNewUser(HttpServletRequest req) {
+        try {
+            UserDataSet userDataSet = getUserDataSetFromRequest(req);
+            if (userDataSet != null) {
+                dbService.create(userDataSet);
+            } else {
+                errorMessage = ERROR_FIELDS_NOT_FILLED;
+            }
+        } catch (MyOrmException e) {
+            errorMessage = e.getMessage();
         }
     }
 
-    private String getParameterFromMap(Map<String, String[]> parameterMap, String key) {
-        if (parameterMap.get(key) != null) {
-            return parameterMap.get(key)[0] != null ? parameterMap.get(key)[0] : "";
-        } else {
-            return "";
+    private void actionDeleteUser() {
+        try {
+            dbService.deleteById(userId, UserDataSet.class);
+        } catch (Exception e) {
+            errorMessage = e.getMessage();
         }
-    }*/
+        userId = -1;
+    }
+
+    private void actionFindUser() {
+        try {
+            userFoundedById = userDataSetToDto(dbService.getById(userId, UserDataSet.class));
+        } catch (Exception e) {
+            errorMessage = e.getMessage();
+            userId = -1;
+        }
+    }
+
+    private void actionUserList() {
+        userList = new ArrayList<>();
+        try {
+            userList = userDataSetListToDtoList(dbService.getAll(UserDataSet.class));
+        } catch (Exception e) {
+            errorMessage = e.getMessage();
+        }
+    }
+
 }
