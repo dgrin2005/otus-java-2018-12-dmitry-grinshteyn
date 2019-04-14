@@ -18,7 +18,7 @@ public class MainClass {
         MySubarray mySubarray4 = myArray.getMySubarray4();
         System.out.println("Before sorting");
         System.out.println(myArray);
-        MySubarray mySubarray = new MySubarray("Array copy", myArray.getArr(), 0, myArray.getSize());
+        MySubarray mySubarray = new MySubarray("MyArray copy", myArray.getArr(), 0, myArray.getSize());
         long startTime = System.currentTimeMillis();
         Thread t1 = new Thread(mySubarray1);
         Thread t2 = new Thread(mySubarray2);
