@@ -9,7 +9,7 @@ public class MySubarray<T extends Comparable> implements Runnable{
     private int left;
     private int right;
 
-    MySubarray(String name, T[] arr, int left, int right) {
+    public MySubarray(String name, T[] arr, int left, int right) {
         this.name = name;
         this.arr = arr;
         this.left = left >= 0 ? left : 0;

@@ -76,6 +76,14 @@ public class MyArray<T extends Comparable> {
         System.arraycopy(result, 0, arr, left, it1 + it2);
     }
 
+    public T[] getArr() {
+        return arr;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
     @Override
     public String toString() {
         return "MyArray=" + Arrays.toString(arr);

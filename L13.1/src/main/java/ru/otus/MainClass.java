@@ -9,7 +9,7 @@ public class MainClass {
     public static void main(String[] args) throws InterruptedException {
 
         MyArray myArray = new MyArray(Integer.class,
-                100000,
+                10000,
                 () -> Math.toIntExact(Math.round(Math.random() * 10000)));
         myArray.splitArray();
         MySubarray mySubarray1 = myArray.getMySubarray1();
@@ -18,6 +18,7 @@ public class MainClass {
         MySubarray mySubarray4 = myArray.getMySubarray4();
         System.out.println("Before sorting");
         System.out.println(myArray);
+        MySubarray mySubarray = new MySubarray("Array copy", myArray.getArr(), 0, myArray.getSize());
         long startTime = System.currentTimeMillis();
         Thread t1 = new Thread(mySubarray1);
         Thread t2 = new Thread(mySubarray2);
@@ -35,7 +36,14 @@ public class MainClass {
         myArray.mergeArray();
         System.out.println("After sorting");
         System.out.println(myArray);
-        System.out.println("Sorting time = " + (endTime - startTime) + " ms");
+        System.out.println("Sorting time (4 threads) = " + (endTime - startTime) + " ms");
+        startTime = System.currentTimeMillis();
+        Thread t = new Thread(mySubarray);
+        t.start();
+        t.join();
+        endTime = System.currentTimeMillis();
+        System.out.println(mySubarray);
+        System.out.println("Sorting time (1 thread) = " + (endTime - startTime) + " ms");
     }
 
 
