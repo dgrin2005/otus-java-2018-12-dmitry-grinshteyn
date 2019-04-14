@@ -21,7 +21,7 @@ public class MyArray<T extends Comparable> {
         for (int i = 0; i < size; i++) {
             this.arr[i] = fill.get();
         }
-            }
+    }
 
     public void splitArray() {
         mySubarray1 = new MySubarray<T>("subarray 1", arr, 0, size / 4);
