@@ -12,11 +12,13 @@ public class MainClass {
         MyArray myArray = new MyArray(Integer.class,
                 10000,
                 () -> Math.toIntExact(Math.round(Math.random() * 10000)));
-        MySubarray mySubarray = new MySubarray("MyArray copy", myArray.getArr(), 0, myArray.getSize());
+        Integer arrayCopy[] = new Integer[myArray.getSize()];
+        System.arraycopy(myArray.getArr(), 0, arrayCopy, 0, myArray.getSize());
+        MySubarray mySubarray = new MySubarray("MyArray copy", arrayCopy, 0, arrayCopy.length);
         System.out.println("Before sorting");
         System.out.println(myArray);
-        SortingInThreads sortingInThreads = new SortingInThreads();
 
+        SortingInThreads sortingInThreads = new SortingInThreads();
         long startTime = System.currentTimeMillis();
         myArray.splitArray();
         MySubarray mySubarray1 = myArray.getMySubarray1();
