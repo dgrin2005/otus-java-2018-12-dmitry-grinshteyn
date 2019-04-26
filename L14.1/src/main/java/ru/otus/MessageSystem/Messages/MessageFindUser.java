@@ -12,7 +12,7 @@ import static ru.otus.WebServer.WebServerUtilites.userDataSetToDto;
 public class MessageFindUser extends MessageToDB {
 
     private long userId;
-    private HttpServletRequest httpServletRequest;
+    private final HttpServletRequest httpServletRequest;
 
     public MessageFindUser(Address from, Address to, HttpServletRequest httpServletRequest, long userId) {
         super(from, to);

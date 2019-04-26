@@ -24,9 +24,9 @@ public class WebServer implements Addressee {
 
     private final static Logger logger = Logger.getLogger(WebServer.class.getName());
     private Server server;
-    private MessageSystemContext messageSystemContext;
-    private Address address;
-    private HttpServlet httpServlet;
+    private final MessageSystemContext messageSystemContext;
+    private final Address address;
+    private final HttpServlet httpServlet;
 
     public WebServer(MessageSystemContext messageSystemContext, Address address) throws IOException {
         this.messageSystemContext = messageSystemContext;

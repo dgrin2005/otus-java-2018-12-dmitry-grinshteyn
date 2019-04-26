@@ -10,11 +10,11 @@ import java.util.List;
 
 public class MessageShowPage extends MessageToWebServer {
 
-    private List<UserDataSetDto> userListDto;
-    private String errorMessage;
-    private String userFoundedById;
-    private long userId;
-    private HttpServletRequest httpServletRequest;
+    private final List<UserDataSetDto> userListDto;
+    private final String errorMessage;
+    private final String userFoundedById;
+    private final long userId;
+    private final HttpServletRequest httpServletRequest;
 
     public MessageShowPage(Address from, Address to, HttpServletRequest httpServletRequest,
                            List<UserDataSetDto> userListDto, String errorMessage, String userFoundedById, long userId) {

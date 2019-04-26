@@ -19,8 +19,8 @@ import java.util.List;
 public class DBServiceHibernateImpl implements DBService, AutoCloseable {
 
     private final SessionFactory sessionFactory;
-    private MessageSystemContext messageSystemContext;
-    private Address address;
+    private final MessageSystemContext messageSystemContext;
+    private final Address address;
 
     public DBServiceHibernateImpl(String configFile,
                                   MessageSystemContext messageSystemContext,

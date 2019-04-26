@@ -26,8 +26,8 @@ public class UserDataSetServlet extends HttpServlet {
     private long userId;
     private String userFoundedById;
     private List<UserDataSetDto> userList;
-    private MessageSystemContext messageSystemContext;
-    private Address address;
+    private final MessageSystemContext messageSystemContext;
+    private final Address address;
     private ConcurrentHashMap<HttpServletRequest, Boolean> flagsToWait;
 
     UserDataSetServlet(MessageSystemContext messageSystemContext, Address address) throws IOException {

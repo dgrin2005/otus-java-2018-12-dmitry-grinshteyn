@@ -9,8 +9,8 @@ import ru.otus.MessageSystem.Message;
 import javax.servlet.http.HttpServletRequest;
 
 public class MessageDeleteById extends MessageToDB {
-    private long userId;
-    private HttpServletRequest httpServletRequest;
+    private final long userId;
+    private final HttpServletRequest httpServletRequest;
 
     public MessageDeleteById(Address from, Address to, HttpServletRequest httpServletRequest, long userId) {
         super(from, to);

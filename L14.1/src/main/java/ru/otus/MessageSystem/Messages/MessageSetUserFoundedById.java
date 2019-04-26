@@ -6,7 +6,7 @@ import ru.otus.WebServer.WebServer;
 
 public class MessageSetUserFoundedById extends MessageToWebServer {
 
-    private String userFoundedById;
+    private final String userFoundedById;
 
     public MessageSetUserFoundedById(Address from, Address to, String userFoundedById) {
         super(from, to);

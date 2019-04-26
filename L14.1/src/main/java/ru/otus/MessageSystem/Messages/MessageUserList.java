@@ -15,11 +15,11 @@ import static ru.otus.WebServer.WebServerUtilites.*;
 
 public class MessageUserList extends MessageToDB {
 
-    private HttpServletRequest httpServletRequest;
+    private final HttpServletRequest httpServletRequest;
     private String errorMessage;
-    private String userFoundedById;
-    private long userId;
-    private Address finalAddressee;
+    private final String userFoundedById;
+    private final long userId;
+    private final Address finalAddressee;
 
     public MessageUserList(Address from, Address to, HttpServletRequest httpServletRequest,
                            String errorMessage, String userFoundedById, long userId, Address finalAddressee) {

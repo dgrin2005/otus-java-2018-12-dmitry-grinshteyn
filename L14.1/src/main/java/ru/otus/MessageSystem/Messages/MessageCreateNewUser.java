@@ -7,7 +7,7 @@ import ru.otus.MessageSystem.Address;
 import ru.otus.MessageSystem.Message;
 
 public class MessageCreateNewUser extends MessageToDB {
-    private UserDataSet userDataSet;
+    private final UserDataSet userDataSet;
 
     public MessageCreateNewUser(Address from, Address to, UserDataSet userDataSet) {
         super(from, to);

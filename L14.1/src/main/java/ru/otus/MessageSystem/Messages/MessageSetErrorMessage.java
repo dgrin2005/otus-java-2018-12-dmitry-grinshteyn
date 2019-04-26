@@ -6,7 +6,7 @@ import ru.otus.WebServer.WebServer;
 
 public class MessageSetErrorMessage extends MessageToWebServer {
 
-    private String errorMessage;
+    private final String errorMessage;
 
     public MessageSetErrorMessage(Address from, Address to, String errorMessage) {
         super(from, to);

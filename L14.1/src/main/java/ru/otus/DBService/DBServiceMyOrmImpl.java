@@ -15,9 +15,9 @@ import java.util.List;
 
 public class DBServiceMyOrmImpl implements DBService, AutoCloseable {
 
-    private Connection connection;
-    private String database;
-    private List<Class> annotatedClasses;
+    private final Connection connection;
+    private final String database;
+    private final List<Class> annotatedClasses;
 
     public DBServiceMyOrmImpl(String database, Class<? extends DataSet>... classes) throws MyOrmException {
         this.database = database;
