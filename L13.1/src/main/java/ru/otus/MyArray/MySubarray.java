@@ -4,10 +4,10 @@ import java.util.Arrays;
 
 @SuppressWarnings("unchecked")
 public class MySubarray<T extends Comparable> implements Runnable{
-    private String name;
-    private T arr[];
-    private int left;
-    private int right;
+    final private String name;
+    final private T arr[];
+    final private int left;
+    final private int right;
 
     public MySubarray(String name, T[] arr, int left, int right) {
         this.name = name;

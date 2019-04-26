@@ -6,9 +6,9 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("unchecked")
 public class MyArray<T extends Comparable> {
-    private T[] arr;
-    private Class<T> tClass;
-    private int size;
+    final private T[] arr;
+    final private Class<T> tClass;
+    final private int size;
     private MySubarray mySubarray1;
     private MySubarray mySubarray2;
     private MySubarray mySubarray3;
@@ -23,30 +23,14 @@ public class MyArray<T extends Comparable> {
         }
     }
 
-    public void splitArray() {
+    private void splitArray() {
         mySubarray1 = new MySubarray<T>("subarray 1", arr, 0, size / 4);
         mySubarray2 = new MySubarray<T>("subarray 2", arr, size / 4, size / 2);
         mySubarray3 = new MySubarray<T>("subarray 3", arr, size / 2, size / 4 * 3);
         mySubarray4 = new MySubarray<T>("subarray 4", arr, size / 4 * 3, size);
     }
 
-    public MySubarray getMySubarray1() {
-        return mySubarray1;
-    }
-
-    public MySubarray getMySubarray2() {
-        return mySubarray2;
-    }
-
-    public MySubarray getMySubarray3() {
-        return mySubarray3;
-    }
-
-    public MySubarray getMySubarray4() {
-        return mySubarray4;
-    }
-
-    public void mergeArray() {
+    private void mergeArray() {
         merge(0, size / 4, size / 2);
         merge(size / 2, size / 4 * 3, size);
         merge(0, size / 2, size);
@@ -82,6 +66,13 @@ public class MyArray<T extends Comparable> {
 
     public int getSize() {
         return size;
+    }
+
+    public void sort() throws InterruptedException {
+        SortingInThreads sortingInThreads = new SortingInThreads();
+        splitArray();
+        sortingInThreads.sort(mySubarray1, mySubarray2, mySubarray3, mySubarray4);
+        mergeArray();
     }
 
     @Override
