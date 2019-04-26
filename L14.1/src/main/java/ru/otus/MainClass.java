@@ -15,14 +15,10 @@ import ru.otus.WebServer.WebServer;
 
 public class MainClass {
     public static void main(String[] args) throws MyOrmException {
-        MessageSystem messageSystem = new MessageSystem();
-
-        MessageSystemContext context = new MessageSystemContext(messageSystem);
-        Address frontAddress = new Address("WS");
-        context.setWebServerAddress(frontAddress);
-        Address dbAddress = new Address("DB");
-        context.setDbAddress(dbAddress);
-
+        final MessageSystem messageSystem = new MessageSystem();
+        final Address frontAddress = new Address("WS");
+        final Address dbAddress = new Address("DB");
+        final MessageSystemContext context = new MessageSystemContext(messageSystem, frontAddress, dbAddress);
         WebServer webServer = null;
 
         try (DBService dbService = new DBServiceHibernateImpl("hibernate.cfg.xml",

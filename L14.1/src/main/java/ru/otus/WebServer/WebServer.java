@@ -84,7 +84,7 @@ public class WebServer implements Addressee {
             }
         } catch (Exception e) {
             logger.log(Level.INFO, e.getMessage());
-            logger.log(Level.INFO, "Web server stopped.");
+            logger.log(Level.INFO, "Error stopping web server.");
         }
     }
 }
