@@ -1,10 +1,11 @@
-package ru.otus.MessageSystem.Messages;
+package ru.otus.MessageSystem.Messages.DB;
 
 import ru.otus.DBService.DBService;
 import ru.otus.DataSet.UserDataSet;
 import ru.otus.Exception.MyOrmException;
 import ru.otus.MessageSystem.Address;
 import ru.otus.MessageSystem.Message;
+import ru.otus.MessageSystem.Messages.WS.MessageSetErrorMessage;
 
 import javax.servlet.http.HttpServletRequest;
 

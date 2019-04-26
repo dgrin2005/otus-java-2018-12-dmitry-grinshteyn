@@ -44,7 +44,7 @@ public class MessageSystem {
                     while (true) {
                         try {
                             Message message = queue.take();
-                            logger.log(Level.INFO, "Thread " + name + " take  message: " + message);
+                            logger.log(Level.INFO, "Thread " + name + " take message: " + message);
                             message.exec(entry.getValue());
                         } catch (Exception e) {
                             logger.log(Level.INFO, e.getMessage());

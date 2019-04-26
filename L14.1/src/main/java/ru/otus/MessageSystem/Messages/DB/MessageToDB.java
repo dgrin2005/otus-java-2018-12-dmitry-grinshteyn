@@ -1,4 +1,4 @@
-package ru.otus.MessageSystem.Messages;
+package ru.otus.MessageSystem.Messages.DB;
 
 import ru.otus.DBService.DBService;
 import ru.otus.Exception.MyOrmException;

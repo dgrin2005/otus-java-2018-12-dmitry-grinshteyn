@@ -4,7 +4,7 @@ import ru.otus.DataSet.UserDataSet;
 import ru.otus.MessageSystem.Address;
 import ru.otus.MessageSystem.Message;
 import ru.otus.MessageSystem.MessageSystemContext;
-import ru.otus.MessageSystem.Messages.*;
+import ru.otus.MessageSystem.Messages.DB.*;
 import ru.otus.WebServer.Dto.UserDataSetDto;
 
 import javax.servlet.http.HttpServlet;

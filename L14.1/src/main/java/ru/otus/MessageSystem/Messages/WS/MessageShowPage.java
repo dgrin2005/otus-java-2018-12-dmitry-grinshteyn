@@ -1,4 +1,4 @@
-package ru.otus.MessageSystem.Messages;
+package ru.otus.MessageSystem.Messages.WS;
 
 import ru.otus.MessageSystem.Address;
 import ru.otus.WebServer.Dto.UserDataSetDto;
