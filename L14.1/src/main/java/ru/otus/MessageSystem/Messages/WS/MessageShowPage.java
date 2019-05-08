@@ -1,37 +1,34 @@
 package ru.otus.MessageSystem.Messages.WS;
 
+import ru.otus.FrontEndService.FrontEndService;
 import ru.otus.MessageSystem.Address;
 import ru.otus.WebServer.Dto.UserDataSetDto;
 import ru.otus.WebServer.UserDataSetServlet;
-import ru.otus.WebServer.WebServer;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-public class MessageShowPage extends MessageToWebServer {
+public class MessageShowPage extends MessageToFrontEnd {
 
     private final List<UserDataSetDto> userListDto;
     private final String errorMessage;
     private final String userFoundedById;
     private final long userId;
-    private final HttpServletRequest httpServletRequest;
+    private final UserDataSetServlet userDataSetServlet;
 
-    public MessageShowPage(Address from, Address to, HttpServletRequest httpServletRequest,
-                           List<UserDataSetDto> userListDto, String errorMessage, String userFoundedById, long userId) {
-        super(from, to);
-        this.httpServletRequest = httpServletRequest;
+    public MessageShowPage(Address from, Address to,
+                           List<UserDataSetDto> userListDto, String errorMessage, String userFoundedById, long userId,
+                           UserDataSetServlet userDataSetServlet) {
+        super(from, to, "");
         this.userListDto = userListDto;
         this.errorMessage = errorMessage;
         this.userFoundedById = userFoundedById;
         this.userId = userId;
+        this.userDataSetServlet = userDataSetServlet;
     }
 
     @Override
-    public void exec(WebServer webServer) {
-        ((UserDataSetServlet)webServer.getHttpServlet()).setUserList(userListDto);
-        ((UserDataSetServlet)webServer.getHttpServlet()).setErrorMessage(errorMessage);
-        ((UserDataSetServlet)webServer.getHttpServlet()).setUserFoundedById(userFoundedById);
-        ((UserDataSetServlet)webServer.getHttpServlet()).setUserId(userId);
-        ((UserDataSetServlet)webServer.getHttpServlet()).setFlagToWait(httpServletRequest,false);
+    public void exec(FrontEndService frontEndService) {
+        frontEndService.queryPut();
+        frontEndService.showPage(userDataSetServlet, userListDto, errorMessage, userFoundedById, userId);
     }
 }

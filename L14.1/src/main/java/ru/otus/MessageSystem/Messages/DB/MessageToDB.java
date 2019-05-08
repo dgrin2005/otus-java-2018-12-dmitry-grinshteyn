@@ -14,7 +14,7 @@ public abstract class MessageToDB extends Message {
     private final static Logger logger = Logger.getLogger(MessageToDB.class.getName());
 
     MessageToDB(Address from, Address to) {
-        super(from, to);
+        super(from, to, "");
     }
 
     @Override

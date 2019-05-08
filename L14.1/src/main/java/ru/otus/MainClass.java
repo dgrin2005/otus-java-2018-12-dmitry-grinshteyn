@@ -11,6 +11,7 @@ import ru.otus.Exception.MyOrmException;
 import ru.otus.MessageSystem.Address;
 import ru.otus.MessageSystem.MessageSystem;
 import ru.otus.MessageSystem.MessageSystemContext;
+import ru.otus.FrontEndService.FrontEndService;
 import ru.otus.WebServer.WebServer;
 
 public class MainClass {
@@ -27,13 +28,11 @@ public class MainClass {
                 PhoneDataSet.class,
                 UserDataSet.class)){
 
-            dbService.initInMessageSystem();
-
             DBInitializationService dbInitializationService = new DBHibernateInitializationServiceImpl(dbService);
             dbInitializationService.initData();
             dbInitializationService.saveDataIntoDB();
-            webServer = new WebServer(context, frontAddress);
-            webServer.initInMessageSystem();
+            FrontEndService frontEndService = new FrontEndService(context, frontAddress);
+            webServer = new WebServer(frontEndService);
             messageSystem.start();
             webServer.start();
         } catch (Exception e) {

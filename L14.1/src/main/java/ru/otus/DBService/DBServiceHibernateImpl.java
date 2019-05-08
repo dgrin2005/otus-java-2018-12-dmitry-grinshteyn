@@ -31,11 +31,7 @@ public class DBServiceHibernateImpl implements DBService, AutoCloseable {
         sessionFactory = createSessionFactory(configuration);
         this.messageSystemContext = messageSystemContext;
         this.address = address;
-    }
-
-    @Override
-    public void initInMessageSystem() {
-        messageSystemContext.getMessageSystem().addAddressee(this);
+        this.messageSystemContext.getMessageSystem().addAddressee(this);
     }
 
     private static SessionFactory createSessionFactory(Configuration configuration) {

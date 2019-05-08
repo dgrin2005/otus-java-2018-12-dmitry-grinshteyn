@@ -1,10 +1,7 @@
 package ru.otus.WebServer;
 
 import ru.otus.DataSet.UserDataSet;
-import ru.otus.MessageSystem.Address;
-import ru.otus.MessageSystem.Message;
-import ru.otus.MessageSystem.MessageSystemContext;
-import ru.otus.MessageSystem.Messages.DB.*;
+import ru.otus.FrontEndService.FrontEndService;
 import ru.otus.WebServer.Dto.UserDataSetDto;
 
 import javax.servlet.http.HttpServlet;
@@ -14,8 +11,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
+import static ru.otus.FrontEndService.FrontEndService.*;
 import static ru.otus.WebServer.WebServerUtilites.*;
 
 public class UserDataSetServlet extends HttpServlet {
@@ -26,28 +23,22 @@ public class UserDataSetServlet extends HttpServlet {
     private long userId;
     private String userFoundedById;
     private List<UserDataSetDto> userList;
-    private final MessageSystemContext messageSystemContext;
-    private final Address address;
-    private ConcurrentHashMap<HttpServletRequest, Boolean> flagsToWait;
+    private final FrontEndService frontEndService;
 
-    UserDataSetServlet(MessageSystemContext messageSystemContext, Address address) throws IOException {
+    UserDataSetServlet(FrontEndService frontEndService) {
         this.templateProcessor = new TemplateProcessor();
         this.errorMessage = "";
         this.userFoundedById = "";
         this.userId = 0;
         this.userList = new ArrayList<>();
-        this.messageSystemContext = messageSystemContext;
-        this.address = address;
-        flagsToWait =  new ConcurrentHashMap<>();
+        this.frontEndService = frontEndService;
     }
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         userId = getUserIdFromRequest(req);
-        setFlagToWait(req, true);
-        doAction(getAction(req), req);
-        while (flagsToWait.get(req)) {
-        }
+        doAction(getAction(req));
+        frontEndService.queryTake();
         Map<String, Object> pageVariables = pageVariablesForUsersList(userList, userId, userFoundedById, errorMessage);
         resp.setContentType("text/html;charset=utf-8");
         resp.getWriter().println(templateProcessor.getPage(PAGE_TEMPLATE, pageVariables));
@@ -61,53 +52,44 @@ public class UserDataSetServlet extends HttpServlet {
         doGet(req, resp);
     }
 
-    private void doAction(String action, HttpServletRequest req) {
+    private void doAction(String action) {
         setUserFoundedById("");
         if (!action.isEmpty() && userId > 0) {
             if (action.equals(PARAMETER_ACTION_VALUE_DELETE)) {
-                actionDeleteUser(req);
+                actionDeleteUser();
             } else {
                 setUserId(-1);
-                actionUserList(req);
+                actionUserList();
             }
         } else {
             if (userId > 0) {
-                actionFindUser(req);
+                actionFindUser();
             } else {
                 setUserId(-1);
-                actionUserList(req);
+                actionUserList();
             }
         }
     }
 
-    private void actionCreateNewUser(HttpServletRequest req) {
+    public void actionCreateNewUser(HttpServletRequest req) {
         UserDataSet userDataSet = getUserDataSetFromRequest(req);
         if (userDataSet != null) {
-            Message message = new MessageCreateNewUser(address, messageSystemContext.getDbAddress(), userDataSet);
-            messageSystemContext.getMessageSystem().sendMessage(message);
+            frontEndService.sendMessage(MESSAGE_ID_CREATE_NEW_USER, userDataSet, this);
         } else {
             setErrorMessage(ERROR_FIELDS_NOT_FILLED);
         }
     }
 
-    private void actionDeleteUser(HttpServletRequest req) {
-        Message message = new MessageDeleteById(address, messageSystemContext.getDbAddress(), req, userId);
-        messageSystemContext.getMessageSystem().sendMessage(message);
+    private void actionDeleteUser() {
+        frontEndService.sendMessage(MESSAGE_ID_DELETE_USER, errorMessage, userFoundedById, userId, this);
     }
 
-    private void actionFindUser(HttpServletRequest req) {
-        Message message = new MessageFindUser(address, messageSystemContext.getDbAddress(), req, userId);
-        messageSystemContext.getMessageSystem().sendMessage(message);
+    private void actionFindUser() {
+        frontEndService.sendMessage(MESSAGE_ID_FIND_USER,  errorMessage, userFoundedById, userId, this);
     }
 
-    private void actionUserList(HttpServletRequest req) {
-        Message message = new MessageUserList(address, messageSystemContext.getDbAddress(), req,
-                errorMessage, userFoundedById, userId, address);
-        messageSystemContext.getMessageSystem().sendMessage(message);
-    }
-
-    public void setFlagToWait(HttpServletRequest req, boolean flagToWait) {
-        flagsToWait.put(req, flagToWait);
+    private void actionUserList() {
+        frontEndService.sendMessage(MESSAGE_ID_USER_LIST, errorMessage, userFoundedById, userId, this);
     }
 
     public void setUserList(List<UserDataSetDto> userList) {
@@ -125,4 +107,5 @@ public class UserDataSetServlet extends HttpServlet {
     public void setUserFoundedById(String userFoundedById) {
         this.userFoundedById = userFoundedById;
     }
+
 }

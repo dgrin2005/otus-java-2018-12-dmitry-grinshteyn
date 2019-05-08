@@ -6,17 +6,17 @@ import ru.otus.Exception.MyOrmException;
 import ru.otus.MessageSystem.Address;
 import ru.otus.MessageSystem.Message;
 import ru.otus.MessageSystem.Messages.WS.MessageSetErrorMessage;
-
-import javax.servlet.http.HttpServletRequest;
+import ru.otus.WebServer.UserDataSetServlet;
 
 public class MessageDeleteById extends MessageToDB {
     private final long userId;
-    private final HttpServletRequest httpServletRequest;
+    private final UserDataSetServlet userDataSetServlet;
 
-    public MessageDeleteById(Address from, Address to, HttpServletRequest httpServletRequest, long userId) {
+    public MessageDeleteById(Address from, Address to, long userId,
+                             UserDataSetServlet userDataSetServlet) {
         super(from, to);
-        this.httpServletRequest = httpServletRequest;
         this.userId = userId;
+        this.userDataSetServlet = userDataSetServlet;
     }
 
     @Override
@@ -27,10 +27,10 @@ public class MessageDeleteById extends MessageToDB {
         } catch (MyOrmException e) {
             errorMessage = e.getMessage();
         }
-        Message message = new MessageSetErrorMessage(getTo(), getFrom(), errorMessage);
+        Message message = new MessageSetErrorMessage(getTo(), getFrom(), errorMessage, userDataSetServlet);
         dbService.getMessageSystem().sendMessage(message);
-        message = new MessageUserList(getTo(), getTo(), httpServletRequest,
-                errorMessage, "", -1, getFrom());
+        message = new MessageUserList(getTo(), getTo(),
+                errorMessage, "", -1, getFrom(), userDataSetServlet);
         dbService.getMessageSystem().sendMessage(message);
     }
 

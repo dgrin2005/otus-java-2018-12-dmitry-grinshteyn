@@ -109,8 +109,4 @@ public class DBServiceMyOrmImpl implements DBService, AutoCloseable {
         return null;
     }
 
-    @Override
-    public void initInMessageSystem() {
-
-    }
 }

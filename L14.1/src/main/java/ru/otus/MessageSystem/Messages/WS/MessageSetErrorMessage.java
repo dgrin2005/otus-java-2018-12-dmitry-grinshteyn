@@ -1,20 +1,22 @@
 package ru.otus.MessageSystem.Messages.WS;
 
+import ru.otus.FrontEndService.FrontEndService;
 import ru.otus.MessageSystem.Address;
 import ru.otus.WebServer.UserDataSetServlet;
-import ru.otus.WebServer.WebServer;
 
-public class MessageSetErrorMessage extends MessageToWebServer {
+public class MessageSetErrorMessage extends MessageToFrontEnd {
 
     private final String errorMessage;
+    private final UserDataSetServlet userDataSetServlet;
 
-    public MessageSetErrorMessage(Address from, Address to, String errorMessage) {
-        super(from, to);
+    public MessageSetErrorMessage(Address from, Address to, String errorMessage, UserDataSetServlet userDataSetServlet) {
+        super(from, to, "");
         this.errorMessage = errorMessage;
+        this.userDataSetServlet = userDataSetServlet;
     }
 
     @Override
-    public void exec(WebServer webServer) {
-        ((UserDataSetServlet)webServer.getHttpServlet()).setErrorMessage(errorMessage);
+    public void exec(FrontEndService frontEndService) {
+        frontEndService.setErrorMessage(userDataSetServlet, errorMessage);
     }
 }
