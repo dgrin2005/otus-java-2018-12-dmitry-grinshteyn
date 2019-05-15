@@ -6,20 +6,20 @@ import ru.otus.MessageSystem.Address;
 import ru.otus.MessageSystem.Message;
 import ru.otus.MessageSystem.Messages.WS.MessageSetErrorMessage;
 import ru.otus.MessageSystem.Messages.WS.MessageSetUserFoundedById;
-import ru.otus.WebServer.UserDataSetServlet;
+
+import java.util.UUID;
 
 import static ru.otus.WebServer.WebServerUtilites.userDataSetToDto;
 
 public class MessageFindUser extends MessageToDB {
 
     private long userId;
-    private final UserDataSetServlet userDataSetServlet;
+    private final UUID uuid;
 
-    public MessageFindUser(Address from, Address to, long userId,
-                           UserDataSetServlet userDataSetServlet) {
+    public MessageFindUser(Address from, Address to, long userId, UUID uuid) {
         super(from, to);
         this.userId = userId;
-        this.userDataSetServlet = userDataSetServlet;
+        this.uuid = uuid;
     }
 
     @Override
@@ -32,12 +32,12 @@ public class MessageFindUser extends MessageToDB {
             errorMessage = e.getMessage();
             userId = -1;
         }
-        Message message = new MessageSetUserFoundedById(getTo(), getFrom(), userFoundedById, userDataSetServlet);
+        Message message = new MessageSetUserFoundedById(getTo(), getFrom(), userFoundedById);
         dbService.getMessageSystem().sendMessage(message);
-        message = new MessageSetErrorMessage(getTo(), getFrom(), errorMessage, userDataSetServlet);
+        message = new MessageSetErrorMessage(getTo(), getFrom(), errorMessage);
         dbService.getMessageSystem().sendMessage(message);
         message = new MessageUserList(getTo(), getTo(),
-                errorMessage, userFoundedById, userId, getFrom(), userDataSetServlet);
+                errorMessage, userFoundedById, userId, getFrom(), uuid);
         dbService.getMessageSystem().sendMessage(message);
     }
 }

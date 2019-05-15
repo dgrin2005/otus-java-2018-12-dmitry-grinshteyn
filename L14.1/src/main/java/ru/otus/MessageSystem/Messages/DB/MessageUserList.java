@@ -7,10 +7,10 @@ import ru.otus.MessageSystem.Address;
 import ru.otus.MessageSystem.Message;
 import ru.otus.MessageSystem.Messages.WS.MessageShowPage;
 import ru.otus.WebServer.Dto.UserDataSetDto;
-import ru.otus.WebServer.UserDataSetServlet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static ru.otus.WebServer.WebServerUtilites.*;
 
@@ -20,17 +20,16 @@ public class MessageUserList extends MessageToDB {
     private final String userFoundedById;
     private final long userId;
     private final Address finalAddressee;
-    private final UserDataSetServlet userDataSetServlet;
+    private final UUID uuid;
 
     public MessageUserList(Address from, Address to,
-                           String errorMessage, String userFoundedById, long userId, Address finalAddressee,
-                           UserDataSetServlet userDataSetServlet) {
+                           String errorMessage, String userFoundedById, long userId, Address finalAddressee, UUID uuid) {
         super(from, to);
         this.errorMessage = errorMessage;
         this.userFoundedById = userFoundedById;
         this.userId = userId;
         this.finalAddressee = finalAddressee;
-        this.userDataSetServlet = userDataSetServlet;
+        this.uuid = uuid;
     }
 
     @Override
@@ -42,7 +41,7 @@ public class MessageUserList extends MessageToDB {
             errorMessage = errorMessage + "\n" +e.getMessage();
         }
         Message message = new MessageShowPage(getTo(), finalAddressee,
-                userListDto, errorMessage, userFoundedById, userId, userDataSetServlet);
+                userListDto, errorMessage, userFoundedById, userId, uuid);
         dbService.getMessageSystem().sendMessage(message);
     }
 

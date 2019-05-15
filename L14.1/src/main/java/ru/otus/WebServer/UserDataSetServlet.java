@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static ru.otus.FrontEndService.FrontEndService.*;
 import static ru.otus.WebServer.WebServerUtilites.*;
@@ -36,9 +37,10 @@ public class UserDataSetServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        UUID uuid = UUID.randomUUID();
         userId = getUserIdFromRequest(req);
-        doAction(getAction(req));
-        frontEndService.queryTake();
+        doAction(getAction(req), uuid);
+        frontEndService.queryTake(uuid);
         Map<String, Object> pageVariables = pageVariablesForUsersList(userList, userId, userFoundedById, errorMessage);
         resp.setContentType("text/html;charset=utf-8");
         resp.getWriter().println(templateProcessor.getPage(PAGE_TEMPLATE, pageVariables));
@@ -48,48 +50,56 @@ public class UserDataSetServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        actionCreateNewUser(req);
+        UUID uuid = UUID.randomUUID();
+        actionCreateNewUser(req, uuid);
         doGet(req, resp);
     }
 
-    private void doAction(String action) {
+    private void doAction(String action, UUID uuid) {
         setUserFoundedById("");
         if (!action.isEmpty() && userId > 0) {
             if (action.equals(PARAMETER_ACTION_VALUE_DELETE)) {
-                actionDeleteUser();
+                actionDeleteUser(uuid);
             } else {
                 setUserId(-1);
-                actionUserList();
+                actionUserList(uuid);
             }
         } else {
             if (userId > 0) {
-                actionFindUser();
+                actionFindUser(uuid);
             } else {
                 setUserId(-1);
-                actionUserList();
+                actionUserList(uuid);
             }
         }
     }
 
-    public void actionCreateNewUser(HttpServletRequest req) {
+    public void actionCreateNewUser(HttpServletRequest req, UUID uuid) {
         UserDataSet userDataSet = getUserDataSetFromRequest(req);
         if (userDataSet != null) {
-            frontEndService.sendMessage(MESSAGE_ID_CREATE_NEW_USER, userDataSet, this);
+            frontEndService.sendMessage(MESSAGE_ID_CREATE_NEW_USER, userDataSet, uuid);
         } else {
             setErrorMessage(ERROR_FIELDS_NOT_FILLED);
         }
     }
 
-    private void actionDeleteUser() {
-        frontEndService.sendMessage(MESSAGE_ID_DELETE_USER, errorMessage, userFoundedById, userId, this);
+    private void actionDeleteUser(UUID uuid) {
+        frontEndService.sendMessage(MESSAGE_ID_DELETE_USER, errorMessage, userFoundedById, userId, uuid);
     }
 
-    private void actionFindUser() {
-        frontEndService.sendMessage(MESSAGE_ID_FIND_USER,  errorMessage, userFoundedById, userId, this);
+    private void actionFindUser(UUID uuid) {
+        frontEndService.sendMessage(MESSAGE_ID_FIND_USER,  errorMessage, userFoundedById, userId, uuid);
     }
 
-    private void actionUserList() {
-        frontEndService.sendMessage(MESSAGE_ID_USER_LIST, errorMessage, userFoundedById, userId, this);
+    private void actionUserList(UUID uuid) {
+        frontEndService.sendMessage(MESSAGE_ID_USER_LIST, errorMessage, userFoundedById, userId, uuid);
+    }
+
+    public void showPage(List<UserDataSetDto> userListDto, String errorMessage, String userFoundedById, long userId) {
+        setUserList(userListDto);
+        setErrorMessage(errorMessage);
+        setUserFoundedById(userFoundedById);
+        setUserId(userId);
     }
 
     public void setUserList(List<UserDataSetDto> userList) {
