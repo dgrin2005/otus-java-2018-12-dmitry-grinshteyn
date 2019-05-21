@@ -20,7 +20,6 @@ public class WebServer {
 
     private final static Logger logger = Logger.getLogger(WebServer.class.getName());
     private Server server;
-    private HttpServlet[] httpServlets;
 
     public WebServer(FrontEndService frontEndService) {
         HttpServlet httpServlet = new UserDataSetServlet(frontEndService);
@@ -34,12 +33,6 @@ public class WebServer {
 
         server = new Server(new InetSocketAddress(HOSTNAME, PORT));
         server.setHandler(new HandlerList(resourceHandler, servletContextHandler));
-
-        httpServlets = new HttpServlet[]{httpServlet};
-    }
-
-    public HttpServlet[] getHttpServlets() {
-        return httpServlets;
     }
 
     public void start() {

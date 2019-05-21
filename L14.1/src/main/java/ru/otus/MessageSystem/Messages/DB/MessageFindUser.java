@@ -4,8 +4,6 @@ import ru.otus.DBService.DBService;
 import ru.otus.DataSet.UserDataSet;
 import ru.otus.MessageSystem.Address;
 import ru.otus.MessageSystem.Message;
-import ru.otus.MessageSystem.Messages.WS.MessageSetErrorMessage;
-import ru.otus.MessageSystem.Messages.WS.MessageSetUserFoundedById;
 
 import java.util.UUID;
 
@@ -32,12 +30,8 @@ public class MessageFindUser extends MessageToDB {
             errorMessage = e.getMessage();
             userId = -1;
         }
-        Message message = new MessageSetUserFoundedById(getTo(), getFrom(), userFoundedById);
-        dbService.getMessageSystem().sendMessage(message);
-        message = new MessageSetErrorMessage(getTo(), getFrom(), errorMessage);
-        dbService.getMessageSystem().sendMessage(message);
-        message = new MessageUserList(getTo(), getTo(),
-                errorMessage, userFoundedById, userId, getFrom(), uuid);
+        Message message = new MessageUserList(getTo(), getTo(),
+                 getFrom(), errorMessage, userFoundedById, userId, uuid);
         dbService.getMessageSystem().sendMessage(message);
     }
 }

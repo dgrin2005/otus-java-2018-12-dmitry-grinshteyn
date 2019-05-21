@@ -3,10 +3,7 @@ package ru.otus.FrontEndService;
 import ru.otus.DataSet.UserDataSet;
 import ru.otus.MessageSystem.*;
 import ru.otus.MessageSystem.Messages.DB.*;
-import ru.otus.WebServer.Dto.UserDataSetDto;
-import ru.otus.WebServer.UserDataSetServlet;
 
-import javax.servlet.http.HttpServlet;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -22,25 +19,16 @@ public class FrontEndService implements Addressee {
     public final static String MESSAGE_ID_FIND_USER = "FindUser";
     public final static String MESSAGE_ID_USER_LIST = "UserList";
 
-    public final static String MESSAGE_ID_SET_USER_FOUNDED_BY_ID = "SetUserFoundedById";
-    public final static String MESSAGE_ID_SET_ERROR_MESSAGE = "SetErrorMessage";
-    public final static String MESSAGE_ID_SHOW_PAGE = "ShowPage";
-
     private final MessageSystemContext messageSystemContext;
     private final Address address;
 
-    private HttpServlet[] httpServlets;
-    private final ConcurrentHashMap<UUID, LinkedBlockingQueue<Integer>> uuidLinkedBlockingQueueConcurrentHashMap;
+    private final ConcurrentHashMap<UUID, LinkedBlockingQueue<Message>> uuidLinkedBlockingQueueConcurrentHashMap;
 
     public FrontEndService(MessageSystemContext messageSystemContext, Address address) {
         this.messageSystemContext = messageSystemContext;
         this.address = address;
         this.messageSystemContext.getMessageSystem().addAddressee(this);
         this.uuidLinkedBlockingQueueConcurrentHashMap = new ConcurrentHashMap<>();
-    }
-
-    public void setHttpServlets(HttpServlet... httpServlets) {
-        this.httpServlets = httpServlets;
     }
 
     @Override
@@ -53,61 +41,66 @@ public class FrontEndService implements Addressee {
         return messageSystemContext.getMessageSystem();
     }
 
-    public void sendMessage(String messageId, UserDataSet userDataSet, UUID uuid) {
+    public Message sendMessage(String messageId, UserDataSet userDataSet, UUID uuid) {
         if (messageId.equals(MESSAGE_ID_CREATE_NEW_USER)) {
             Message message = new MessageCreateNewUser(address, messageSystemContext.getDbAddress(), userDataSet, uuid);
-            messageSystemContext.getMessageSystem().sendMessage(message);
+            return sendAndWaitMessage(message, uuid);
         }
+        return null;
     }
 
-    public void sendMessage(String messageId,
-                            String errorMessage, String userFoundedById, long userId, UUID uuid) {
+    public Message sendMessage(String messageId, UUID uuid) {
+        if (messageId.equals(MESSAGE_ID_USER_LIST)) {
+            Message message = new MessageUserList(address, messageSystemContext.getDbAddress(), address, uuid);
+            return sendAndWaitMessage(message, uuid);
+        }
+        return null;
+    }
+
+    public Message sendMessage(String messageId, long userId, UUID uuid) {
         if (messageId.equals(MESSAGE_ID_DELETE_USER)) {
             Message message = new MessageDeleteById(address, messageSystemContext.getDbAddress(), userId, uuid);
-            messageSystemContext.getMessageSystem().sendMessage(message);
+            return sendAndWaitMessage(message, uuid);
         }
         if (messageId.equals(MESSAGE_ID_FIND_USER)) {
             Message message = new MessageFindUser(address, messageSystemContext.getDbAddress(), userId, uuid);
-            messageSystemContext.getMessageSystem().sendMessage(message);
+            return sendAndWaitMessage(message, uuid);
         }
-        if (messageId.equals(MESSAGE_ID_USER_LIST)) {
-            Message message = new MessageUserList(address, messageSystemContext.getDbAddress(),
-                    errorMessage, userFoundedById, userId, address, uuid);
-            messageSystemContext.getMessageSystem().sendMessage(message);
-        }
+        return null;
     }
 
-    public void handleMessage(String messageId,
-                              List<UserDataSetDto> userListDto, String errorMessage, String userFoundedById, long userId) {
-        if (messageId.equals(MESSAGE_ID_SHOW_PAGE)) {
-            ((UserDataSetServlet)httpServlets[0]).showPage(userListDto, errorMessage, userFoundedById, userId);
-        }
+    private Message sendAndWaitMessage(Message message, UUID uuid) {
+        queryPut(uuid, message);
+        messageSystemContext.getMessageSystem().sendMessage(message);
+        queryTake(uuid);
+        return queryTake(uuid);
     }
 
-    public void handleMessage(String messageId,
-                              String messageString) {
-        if (messageId.equals(MESSAGE_ID_SET_ERROR_MESSAGE)) {
-            ((UserDataSetServlet)httpServlets[0]).setErrorMessage(messageString);
+
+    public void queryPut(UUID uuid, Message message) {
+        LinkedBlockingQueue<Message> queue;
+        if (uuidLinkedBlockingQueueConcurrentHashMap.containsKey(uuid)) {
+            queue = uuidLinkedBlockingQueueConcurrentHashMap.get(uuid);
+        } else {
+            queue = new LinkedBlockingQueue<>();
         }
-        if (messageId.equals(MESSAGE_ID_SET_USER_FOUNDED_BY_ID)) {
-            ((UserDataSetServlet)httpServlets[0]).setUserFoundedById(messageString);
-        }
+        queue.add(message);
+        uuidLinkedBlockingQueueConcurrentHashMap.put(uuid, queue);
     }
 
-    public void queryPut(UUID uuid) {
-        uuidLinkedBlockingQueueConcurrentHashMap.compute(uuid, (k, v) -> new LinkedBlockingQueue<>(1)).add(1);
-    }
-
-    public void queryTake(UUID uuid) {
-        LinkedBlockingQueue<Integer> queue = null;
+    private Message queryTake(UUID uuid) {
+        LinkedBlockingQueue <Message> queue = null;
+        Message message = null;
         while (queue == null) {
             queue = uuidLinkedBlockingQueueConcurrentHashMap.computeIfPresent(uuid, (k, v) -> v);
         }
-        try {
-            queue.take();
-        } catch (InterruptedException e) {
-            logger.log(Level.INFO, "FrontEndService interrupted.");
+        while (message == null) {
+            try {
+                message = queue.take();
+            } catch (InterruptedException e) {
+                logger.log(Level.INFO, "FrontEndService interrupted.");
+            }
         }
+        return message;
     }
-
 }

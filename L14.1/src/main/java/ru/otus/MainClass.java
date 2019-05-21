@@ -33,7 +33,6 @@ public class MainClass {
             dbInitializationService.saveDataIntoDB();
             FrontEndService frontEndService = new FrontEndService(context, frontAddress);
             webServer = new WebServer(frontEndService);
-            frontEndService.setHttpServlets(webServer.getHttpServlets());
             messageSystem.start();
             webServer.start();
         } catch (Exception e) {

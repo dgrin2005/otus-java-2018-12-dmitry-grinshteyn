@@ -7,18 +7,21 @@ import ru.otus.WebServer.Dto.UserDataSetDto;
 import java.util.List;
 import java.util.UUID;
 
-import static ru.otus.FrontEndService.FrontEndService.MESSAGE_ID_SHOW_PAGE;
-
 public class MessageShowPage extends MessageToFrontEnd {
 
     private final List<UserDataSetDto> userListDto;
+
     private final String errorMessage;
     private final String userFoundedById;
     private final long userId;
+
     private final UUID uuid;
 
     public MessageShowPage(Address from, Address to,
-                           List<UserDataSetDto> userListDto, String errorMessage, String userFoundedById, long userId,
+                           List<UserDataSetDto> userListDto,
+                           String errorMessage,
+                           String userFoundedById,
+                           long userId,
                            UUID uuid) {
         super(from, to, "");
         this.userListDto = userListDto;
@@ -30,7 +33,23 @@ public class MessageShowPage extends MessageToFrontEnd {
 
     @Override
     public void exec(FrontEndService frontEndService) {
-        frontEndService.queryPut(uuid);
-        frontEndService.handleMessage(MESSAGE_ID_SHOW_PAGE, userListDto, errorMessage, userFoundedById, userId);
+        frontEndService.queryPut(uuid, this);
     }
+
+    public List<UserDataSetDto> getUserListDto() {
+        return userListDto;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public String getUserFoundedById() {
+        return userFoundedById;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
 }

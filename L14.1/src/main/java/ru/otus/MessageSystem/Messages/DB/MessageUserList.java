@@ -23,7 +23,27 @@ public class MessageUserList extends MessageToDB {
     private final UUID uuid;
 
     public MessageUserList(Address from, Address to,
-                           String errorMessage, String userFoundedById, long userId, Address finalAddressee, UUID uuid) {
+                           Address finalAddressee, UUID uuid) {
+        super(from, to);
+        this.errorMessage = "";
+        this.userFoundedById = "";
+        this.userId = -1;
+        this.finalAddressee = finalAddressee;
+        this.uuid = uuid;
+    }
+
+    MessageUserList(Address from, Address to,
+                    Address finalAddressee, String errorMessage, UUID uuid) {
+        super(from, to);
+        this.errorMessage = errorMessage;
+        this.userFoundedById = "";
+        this.userId = -1;
+        this.finalAddressee = finalAddressee;
+        this.uuid = uuid;
+    }
+
+    MessageUserList(Address from, Address to,
+                    Address finalAddressee, String errorMessage, String userFoundedById, long userId, UUID uuid) {
         super(from, to);
         this.errorMessage = errorMessage;
         this.userFoundedById = userFoundedById;

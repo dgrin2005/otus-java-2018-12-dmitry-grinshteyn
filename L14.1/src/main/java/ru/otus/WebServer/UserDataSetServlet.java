@@ -2,6 +2,7 @@ package ru.otus.WebServer;
 
 import ru.otus.DataSet.UserDataSet;
 import ru.otus.FrontEndService.FrontEndService;
+import ru.otus.MessageSystem.Messages.WS.MessageShowPage;
 import ru.otus.WebServer.Dto.UserDataSetDto;
 
 import javax.servlet.http.HttpServlet;
@@ -40,7 +41,6 @@ public class UserDataSetServlet extends HttpServlet {
         UUID uuid = UUID.randomUUID();
         userId = getUserIdFromRequest(req);
         doAction(getAction(req), uuid);
-        frontEndService.queryTake(uuid);
         Map<String, Object> pageVariables = pageVariablesForUsersList(userList, userId, userFoundedById, errorMessage);
         resp.setContentType("text/html;charset=utf-8");
         resp.getWriter().println(templateProcessor.getPage(PAGE_TEMPLATE, pageVariables));
@@ -52,7 +52,11 @@ public class UserDataSetServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         UUID uuid = UUID.randomUUID();
         actionCreateNewUser(req, uuid);
-        doGet(req, resp);
+        Map<String, Object> pageVariables = pageVariablesForUsersList(userList, userId, userFoundedById, errorMessage);
+        resp.setContentType("text/html;charset=utf-8");
+        resp.getWriter().println(templateProcessor.getPage(PAGE_TEMPLATE, pageVariables));
+        resp.setStatus(HttpServletResponse.SC_OK);
+        setErrorMessage("");
     }
 
     private void doAction(String action, UUID uuid) {
@@ -74,47 +78,51 @@ public class UserDataSetServlet extends HttpServlet {
         }
     }
 
-    public void actionCreateNewUser(HttpServletRequest req, UUID uuid) {
+    private void actionCreateNewUser(HttpServletRequest req, UUID uuid) {
+        setUserId(-1);
         UserDataSet userDataSet = getUserDataSetFromRequest(req);
         if (userDataSet != null) {
-            frontEndService.sendMessage(MESSAGE_ID_CREATE_NEW_USER, userDataSet, uuid);
+            MessageShowPage message = (MessageShowPage)frontEndService.sendMessage(MESSAGE_ID_CREATE_NEW_USER, userDataSet, uuid);
+            setUserList(message.getUserListDto());
+            setErrorMessage(message.getErrorMessage());
         } else {
             setErrorMessage(ERROR_FIELDS_NOT_FILLED);
         }
     }
 
     private void actionDeleteUser(UUID uuid) {
-        frontEndService.sendMessage(MESSAGE_ID_DELETE_USER, errorMessage, userFoundedById, userId, uuid);
+        MessageShowPage message = (MessageShowPage)frontEndService.sendMessage(MESSAGE_ID_DELETE_USER, userId, uuid);
+        setUserId(-1);
+        setUserList(message.getUserListDto());
+        setErrorMessage(message.getErrorMessage());
     }
 
     private void actionFindUser(UUID uuid) {
-        frontEndService.sendMessage(MESSAGE_ID_FIND_USER,  errorMessage, userFoundedById, userId, uuid);
+        MessageShowPage message = (MessageShowPage)frontEndService.sendMessage(MESSAGE_ID_FIND_USER, userId, uuid);
+        setUserId(message.getUserId());
+        setUserFoundedById(message.getUserFoundedById());
+        setErrorMessage(message.getErrorMessage());
     }
 
     private void actionUserList(UUID uuid) {
-        frontEndService.sendMessage(MESSAGE_ID_USER_LIST, errorMessage, userFoundedById, userId, uuid);
+        MessageShowPage message = (MessageShowPage)frontEndService.sendMessage(MESSAGE_ID_USER_LIST, uuid);
+        setUserList(message.getUserListDto());
+        setErrorMessage(message.getErrorMessage());
     }
 
-    public void showPage(List<UserDataSetDto> userListDto, String errorMessage, String userFoundedById, long userId) {
-        setUserList(userListDto);
-        setErrorMessage(errorMessage);
-        setUserFoundedById(userFoundedById);
-        setUserId(userId);
-    }
-
-    public void setUserList(List<UserDataSetDto> userList) {
+    private void setUserList(List<UserDataSetDto> userList) {
         this.userList = userList;
     }
 
-    public void setErrorMessage(String errorMessage) {
+    private void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
 
-    public void setUserId(long userId) {
+    private void setUserId(long userId) {
         this.userId = userId;
     }
 
-    public void setUserFoundedById(String userFoundedById) {
+    private void setUserFoundedById(String userFoundedById) {
         this.userFoundedById = userFoundedById;
     }
 

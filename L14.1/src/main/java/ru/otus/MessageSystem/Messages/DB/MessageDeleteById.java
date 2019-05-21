@@ -5,7 +5,6 @@ import ru.otus.DataSet.UserDataSet;
 import ru.otus.Exception.MyOrmException;
 import ru.otus.MessageSystem.Address;
 import ru.otus.MessageSystem.Message;
-import ru.otus.MessageSystem.Messages.WS.MessageSetErrorMessage;
 
 import java.util.UUID;
 
@@ -27,10 +26,8 @@ public class MessageDeleteById extends MessageToDB {
         } catch (MyOrmException e) {
             errorMessage = e.getMessage();
         }
-        Message message = new MessageSetErrorMessage(getTo(), getFrom(), errorMessage);
-        dbService.getMessageSystem().sendMessage(message);
-        message = new MessageUserList(getTo(), getTo(),
-                errorMessage, "", -1, getFrom(), uuid);
+        Message message = new MessageUserList(getTo(), getTo(),
+                 getFrom(), errorMessage, uuid);
         dbService.getMessageSystem().sendMessage(message);
     }
 
