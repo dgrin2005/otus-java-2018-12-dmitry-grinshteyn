@@ -70,12 +70,18 @@ public class FrontEndService implements Addressee {
     }
 
     private Message sendAndWaitMessage(Message message, UUID uuid) {
-        queryPut(uuid, message);
+        putNewUuidToMap(uuid);
         messageSystemContext.getMessageSystem().sendMessage(message);
-        queryTake(uuid);
         return queryTake(uuid);
     }
 
+    private void putNewUuidToMap(UUID uuid) {
+        LinkedBlockingQueue<Message> queue;
+        if (!uuidLinkedBlockingQueueConcurrentHashMap.containsKey(uuid)) {
+            queue = new LinkedBlockingQueue<>();
+            uuidLinkedBlockingQueueConcurrentHashMap.put(uuid, queue);
+        }
+    }
 
     public void queryPut(UUID uuid, Message message) {
         LinkedBlockingQueue<Message> queue;
@@ -94,12 +100,10 @@ public class FrontEndService implements Addressee {
         while (queue == null) {
             queue = uuidLinkedBlockingQueueConcurrentHashMap.computeIfPresent(uuid, (k, v) -> v);
         }
-        while (message == null) {
-            try {
-                message = queue.take();
-            } catch (InterruptedException e) {
-                logger.log(Level.INFO, "FrontEndService interrupted.");
-            }
+        try {
+            message = queue.take();
+        } catch (InterruptedException e) {
+            logger.log(Level.INFO, "FrontEndService interrupted.");
         }
         return message;
     }

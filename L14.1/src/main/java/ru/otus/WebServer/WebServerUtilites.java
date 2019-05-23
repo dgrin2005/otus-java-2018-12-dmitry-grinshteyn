@@ -21,8 +21,8 @@ public class WebServerUtilites {
     private final static String PARAMETER_KEY_AGE = "age";
     private final static String PARAMETER_KEY_ADDRESS = "address";
     private final static String PARAMETER_KEY_PHONE = "phone";
-    final static String PARAMETER_ACTION_VALUE_DELETE = "delete";
-    final static String ERROR_FIELDS_NOT_FILLED = "Не все реквизиты заполнены";
+    public final static String PARAMETER_ACTION_VALUE_DELETE = "delete";
+    public final static String ERROR_FIELDS_NOT_FILLED = "Не все реквизиты заполнены";
 
     static String getAction(HttpServletRequest req) {
         return getParameterFromMap(req.getParameterMap(), PARAMETER_KEY_ACTION);
@@ -37,7 +37,7 @@ public class WebServerUtilites {
         }
     }
 
-    static UserDataSet getUserDataSetFromRequest(HttpServletRequest req) {
+    public static UserDataSet getUserDataSetFromRequest(HttpServletRequest req) {
         Map<String, String[]> parameterMap = req.getParameterMap();
         String name = getParameterFromMap(parameterMap, PARAMETER_KEY_NAME);
         String age = getParameterFromMap(parameterMap, PARAMETER_KEY_AGE);
@@ -70,17 +70,42 @@ public class WebServerUtilites {
         return userDataSet.from().toString();
     }
 
-    static Map<String, Object> pageVariablesForUsersList(List<UserDataSetDto> userList,
-                                                                long userId,
-                                                                String userFoundedById,
-                                                                String errorMessage) {
+    static Map<String, Object> pageVariablesForUsersList() {
+        String errorMessage = "";
+        long userId = 0;
+        String userFoundedById = "";
+        List<UserDataSetDto> userList =  new ArrayList<>();
         Map<String, Object> pageVariables = new HashMap<>();
+        setUserListToMap(pageVariables, userList);
+        setUserIdToMap(pageVariables, userId);
+        setUserFoundedByIdToMap(pageVariables, userFoundedById);
+        setErrorMessageToMap(pageVariables, errorMessage);
+        return pageVariables;
+    }
+
+    public static long getUserIdFromMap(Map<String, Object> parameterMap) {
+        if (parameterMap.get("userid") != null) {
+            return (long) parameterMap.get("userid");
+        } else {
+            return 0;
+        }
+    }
+
+    public static void setUserListToMap(Map<String, Object> pageVariables, List<UserDataSetDto> userList) {
         pageVariables.put("users", userList);
         pageVariables.put("useramount", userList.size());
-        pageVariables.put("userid", userId);
-        pageVariables.put("userbyid", userFoundedById);
+    }
+
+    public static void setErrorMessageToMap(Map<String, Object> pageVariables, String errorMessage) {
         pageVariables.put("errormessage", errorMessage);
-        return pageVariables;
+    }
+
+    public static void setUserIdToMap(Map<String, Object> pageVariables, long userId) {
+        pageVariables.put("userid", userId);
+    }
+
+    public static void setUserFoundedByIdToMap(Map<String, Object> pageVariables, String userFoundedById) {
+        pageVariables.put("userbyid", userFoundedById);
     }
 
     private static String getParameterFromMap(Map<String, String[]> parameterMap, String key) {
