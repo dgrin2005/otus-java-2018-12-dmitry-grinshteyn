@@ -1,0 +1,49 @@
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="frontAddress" class="ru.otus.MessageSystem.Address">
+        <constructor-arg index="0" value="FE"/>
+    </bean>
+
+    <bean id="dbAddress" class="ru.otus.MessageSystem.Address">
+        <constructor-arg index="0" value="DB"/>
+    </bean>
+
+    <bean id="messageSystem" class="ru.otus.MessageSystem.MessageSystem" destroy-method="stop">
+    </bean>
+
+    <bean id="messageSystemContext" class="ru.otus.MessageSystem.MessageSystemContext">
+        <constructor-arg index="0" ref="messageSystem"/>
+        <constructor-arg index="1" ref="frontAddress"/>
+        <constructor-arg index="2" ref="dbAddress"/>
+    </bean>
+
+    <bean id="frontEndService" class="ru.otus.FrontEnd.FrontEndService">
+        <constructor-arg index="0" ref="messageSystemContext"/>
+        <constructor-arg index="1" ref="frontAddress"/>
+    </bean>
+
+    <bean id="dbService" class="ru.otus.DBService.DBServiceHibernateImpl">
+        <constructor-arg index="0" value="hibernate.cfg.xml"/>
+        <constructor-arg index="1" ref="messageSystemContext"/>
+        <constructor-arg index="2" ref="dbAddress"/>
+        <constructor-arg index="3">
+            <list>
+                <value>ru.otus.DataSet.AddressDataSet</value>
+                <value>ru.otus.DataSet.PhoneDataSet</value>
+                <value>ru.otus.DataSet.UserDataSet</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="dbInitializationService" class="ru.otus.DBInitialization.DBHibernateInitializationServiceImpl" init-method="initData">
+        <constructor-arg ref="dbService"/>
+    </bean>
+
+    <bean id="userDataSetService" class="ru.otus.FrontEnd.Service.UserDataSetServiceImpl">
+        <constructor-arg ref="frontEndService"/>
+    </bean>
+
+</beans>
