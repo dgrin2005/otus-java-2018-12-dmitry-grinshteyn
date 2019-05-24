@@ -95,13 +95,10 @@ public class FrontEndService implements Addressee {
     }
 
     private Message queryTake(UUID uuid) {
-        LinkedBlockingQueue <Message> queue = null;
+        LinkedBlockingQueue <Message> queue = uuidLinkedBlockingQueueConcurrentHashMap.computeIfPresent(uuid, (k, v) -> v);
         Message message = null;
-        while (queue == null) {
-            queue = uuidLinkedBlockingQueueConcurrentHashMap.computeIfPresent(uuid, (k, v) -> v);
-        }
         try {
-            message = queue.take();
+            message = Objects.requireNonNull(queue).take();
         } catch (InterruptedException e) {
             logger.log(Level.INFO, "FrontEndService interrupted.");
         }
