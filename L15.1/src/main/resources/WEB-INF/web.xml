@@ -5,6 +5,10 @@
     <display-name>OTUS Homework 15</display-name>
     <description>OTUS Homework 15</description>
 
+    <listener>
+        <listener-class>ru.otus.SpringApplicationContextListener</listener-class>
+    </listener>
+
     <servlet>
         <servlet-name>userDataSetServlet</servlet-name>
         <servlet-class>ru.otus.FrontEnd.UserDataSetServlet</servlet-class>

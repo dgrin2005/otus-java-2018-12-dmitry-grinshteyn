@@ -1,10 +1,11 @@
 package ru.otus.FrontEnd;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.otus.FrontEnd.Service.UserDataSetService;
 import ru.otus.FrontEnd.Service.UserDataSetServiceImpl;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,8 +25,10 @@ public class UserDataSetServlet extends HttpServlet {
         this.templateProcessor = new TemplateProcessor();
     }
 
-    public void init() {
-        ApplicationContext context = new ClassPathXmlApplicationContext("SpringBeans.xml");
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        ApplicationContext context = (ApplicationContext) config.getServletContext().getAttribute("applicationContext");
         userDataSetService = context.getBean("userDataSetService", UserDataSetServiceImpl.class);
     }
 
