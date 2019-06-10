@@ -1,0 +1,26 @@
+package ru.otus.DBWorker;
+
+import ru.otus.workers.SocketMessageWorker;
+
+import java.io.IOException;
+import java.net.Socket;
+
+public class ClientSocketMessageWorker extends SocketMessageWorker {
+
+    private final Socket socket;
+
+    public ClientSocketMessageWorker(String host, int port) throws IOException {
+        this(new Socket(host, port));
+    }
+
+    private ClientSocketMessageWorker(Socket socket) {
+        super(socket);
+        this.socket = socket;
+    }
+
+    @Override
+    public void close() throws IOException {
+        super.close();
+        socket.close();
+    }
+}
