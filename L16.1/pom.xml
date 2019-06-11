@@ -10,7 +10,8 @@
   <modules>
     <module>L16.1_MS</module>
     <module>L16.1_DB</module>
-    <module>L16.1_FE</module>
+    <module>L16.1_FE_1</module>
+    <module>L16.1_FE_2</module>
   </modules>
 
   <name>OTUS_HW_16</name>

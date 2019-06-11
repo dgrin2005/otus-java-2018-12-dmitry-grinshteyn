@@ -1,7 +1,7 @@
-package ru.otus.DBWorker;
+package ru.otus.FEWorker;
 
 import ru.otus.messages.Address;
-import ru.otus.messages.DBMessage;
+import ru.otus.messages.FEMessage;
 import ru.otus.workers.SocketMessageWorker;
 
 import java.io.IOException;
@@ -15,8 +15,8 @@ public class ClientSocketMessageWorker extends SocketMessageWorker {
         this(new Socket(host, port), index);
     }
 
-    private ClientSocketMessageWorker(Socket socket, int index) {
-        super(socket, new Address(DBMessage.class.getName(), index));
+    public ClientSocketMessageWorker(Socket socket, int index) {
+        super(socket, new Address(FEMessage.class.getName(), index));
         this.socket = socket;
     }
 

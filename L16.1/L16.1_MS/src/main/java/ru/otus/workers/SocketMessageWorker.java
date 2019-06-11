@@ -3,6 +3,9 @@ package ru.otus.workers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import ru.otus.messages.Address;
+import ru.otus.messages.DBMessage;
+import ru.otus.messages.FEMessage;
 import ru.otus.messages.Message;
 
 import java.io.BufferedReader;
@@ -19,9 +22,17 @@ public class SocketMessageWorker implements MessageWorker {
     private final Socket socket;
     private final BlockingQueue<Message> output = new LinkedBlockingQueue<>();
     private final BlockingQueue<Message> input = new LinkedBlockingQueue<>();
+    volatile private static int counter = 0;
+    private Address address;
 
     public SocketMessageWorker(Socket socket) {
         this.socket = socket;
+        executorService = Executors.newFixedThreadPool(WORKER_COUNT);
+    }
+
+    public SocketMessageWorker(Socket socket, Address address) {
+        this.socket = socket;
+        this.address = address;
         executorService = Executors.newFixedThreadPool(WORKER_COUNT);
     }
 
@@ -87,7 +98,31 @@ public class SocketMessageWorker implements MessageWorker {
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = (JsonObject) parser.parse(json);
         jsonObject = (JsonObject) jsonObject.get("from");
-        Class<?> messageClass = Class.forName(jsonObject.get("id").getAsString());
+        Class<?> messageClass = Class.forName(jsonObject.get("className").getAsString());
         return new Gson().fromJson(json, (Type) messageClass);
+    }
+
+    public void setAddress() {
+        if (counter<2) {
+            this.address = new Address(DBMessage.class.getName(), counter);
+        } else {
+            this.address = new Address(FEMessage.class.getName(), counter - 2);
+        }
+        counter++;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public Address getCorrespondentAddress(Class className, int index) {
+        return new Address(className.getName(), index);
+    }
+
+    @Override
+    public String toString() {
+        return "SocketMessageWorker{" +
+                "address=" + address +
+                '}';
     }
 }

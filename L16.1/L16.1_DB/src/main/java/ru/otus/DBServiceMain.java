@@ -23,12 +23,11 @@ import static ru.otus.ServerMain.*;
 public class DBServiceMain {
 
     private final static Logger logger = Logger.getLogger(DBServiceMain.class.getName());
-
     private SocketMessageWorker client;
 
     public static void main(String[] args) throws MyOrmException {
 
-        try (DBService dbService = new DBServiceHibernateImpl("hibernate.cfg.xml",
+        try (DBService dbService = new DBServiceHibernateImpl(args[0],
                 AddressDataSet.class,
                 PhoneDataSet.class,
                 UserDataSet.class)){
@@ -36,7 +35,7 @@ public class DBServiceMain {
             DBInitializationService dbInitializationService = new DBHibernateInitializationServiceImpl(dbService);
             dbInitializationService.initData();
 
-            new DBServiceMain().start(dbService);
+            new DBServiceMain().start(dbService, Integer.parseInt(args[1]));
 
             while (true) {
             }
@@ -46,8 +45,8 @@ public class DBServiceMain {
         }
     }
 
-    private void start(DBService dbService) throws InterruptedException, IOException {
-        client = new ClientSocketMessageWorker(HOST, PORT);
+    private void start(DBService dbService, int index) throws InterruptedException, IOException {
+        client = new ClientSocketMessageWorker(HOST, PORT_MS, index);
         client.init();
         logger.log(Level.INFO, "Start DB client");
         ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();

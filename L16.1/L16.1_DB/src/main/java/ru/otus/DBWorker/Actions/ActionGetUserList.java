@@ -6,6 +6,7 @@ import ru.otus.DataSet.UserDataSet;
 import ru.otus.Exception.MyOrmException;
 import ru.otus.MessageDto;
 import ru.otus.messages.DBMessage;
+import ru.otus.messages.FEMessage;
 import ru.otus.messages.Message;
 import ru.otus.workers.SocketMessageWorker;
 
@@ -16,8 +17,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static ru.otus.ServerMain.dbAddress;
-import static ru.otus.ServerMain.feAddress;
 import static ru.otus.messages.Message.MESSAGE_ID_SHOW_PAGE;
 
 public class ActionGetUserList implements Consumer<DBServiceActionsParameters> {
@@ -49,7 +48,7 @@ public class ActionGetUserList implements Consumer<DBServiceActionsParameters> {
         } catch (MyOrmException e) {
             errorMessage = errorMessage + "\n" +e.getMessage();
         }
-        Message message = new DBMessage(dbAddress, feAddress, MESSAGE_ID_SHOW_PAGE, msg.getUuid(), new MessageDto(userId, userFoundedById, errorMessage), messageDtoList);
+        Message message = new DBMessage(client.getAddress(), client.getCorrespondentAddress(FEMessage.class, client.getAddress().getId()), MESSAGE_ID_SHOW_PAGE, msg.getUuid(), new MessageDto(userId, userFoundedById, errorMessage), messageDtoList);
         client.send(message);
         logger.log(Level.INFO, "DB Message send: " + msg.toString());
     }

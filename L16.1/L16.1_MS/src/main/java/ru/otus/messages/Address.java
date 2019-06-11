@@ -1,15 +1,12 @@
 package ru.otus.messages;
 
-import java.util.UUID;
-
 public class Address {
-    private final String id;
 
-    public Address(){
-        id = String.valueOf(UUID.randomUUID());
-    }
+    private final String className;
+    private final int id;
 
-    public Address(String id) {
+    public Address(String className, int id) {
+        this.className = className;
         this.id = id;
     }
 
@@ -20,21 +17,26 @@ public class Address {
 
         Address address = (Address) o;
 
-        return id != null ? id.equals(address.id) : address.id == null;
+        return className != null ? (className.equals(address.className) && id == address.id) : address.className == null;
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return className != null ? className.hashCode() : 0;
     }
 
-    public String getId() {
+    public String getClassName() {
+        return className;
+    }
+
+    public int getId() {
         return id;
     }
 
     @Override
     public String toString() {
         return "Address{" +
+                "className='" + className + '\'' +
                 "id='" + id + '\'' +
                 '}';
     }

@@ -9,10 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>L16.1_FE</artifactId>
+    <artifactId>L16.1_FE_1</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>OTUS_HW_16_FE</name>
+    <name>OTUS_HW_16_FE_1</name>
     <description>OTUS Homework 16.1 FE</description>
 
     <developers>
@@ -72,11 +72,6 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
             <version>9.4.9.v20180320</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.5</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

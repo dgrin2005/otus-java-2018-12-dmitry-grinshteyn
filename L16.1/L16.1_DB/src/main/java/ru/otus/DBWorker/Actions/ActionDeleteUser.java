@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static ru.otus.ServerMain.dbAddress;
 import static ru.otus.messages.Message.MESSAGE_ID_USER_LIST;
 
 public class ActionDeleteUser implements Consumer<DBServiceActionsParameters> {
@@ -30,7 +29,7 @@ public class ActionDeleteUser implements Consumer<DBServiceActionsParameters> {
         } catch (MyOrmException e) {
             errorMessage = e.getMessage();
         }
-        Message message = new FEMessage(dbAddress, dbAddress, MESSAGE_ID_USER_LIST, msg.getUuid(), new MessageDto(errorMessage));
+        Message message = new FEMessage(client.getAddress(), client.getAddress(), MESSAGE_ID_USER_LIST, msg.getUuid(), new MessageDto(errorMessage));
         client.send(message);
         logger.log(Level.INFO, "DB Message send: " + msg.toString());
     }

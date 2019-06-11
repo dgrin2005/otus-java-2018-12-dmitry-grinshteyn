@@ -4,8 +4,10 @@ import ru.otus.messages.Message;
 import ru.otus.workers.MessageWorker;
 import ru.otus.workers.SocketMessageWorker;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -23,10 +25,15 @@ public class SocketMessageServer implements SocketMessageServerMBean {
     private final ExecutorService excecutorService;
     private final List<MessageWorker> workers;
 
-    public SocketMessageServer(){
+    private List<SocketMessageWorker> workersDB;
+    private List<SocketMessageWorker> workersFE;
+
+    public SocketMessageServer() throws IOException {
         logger.log(Level.INFO, "Start server");
         excecutorService = Executors.newFixedThreadPool(THREADS_COUNT);
         workers = new CopyOnWriteArrayList<>();
+        workersDB = new ArrayList<>();
+        workersFE = new ArrayList<>();
     }
 
     public void start() throws Exception{
@@ -37,6 +44,14 @@ public class SocketMessageServer implements SocketMessageServerMBean {
                 SocketMessageWorker worker = new SocketMessageWorker(socket);
                 worker.init();
                 workers.add(worker);
+                if (workers.size() <= 2) {
+                    workersDB.add(worker);
+                    logger.log(Level.INFO, "Added DBService worker № " + workers.size());
+                } else {
+                    workersFE.add(worker);
+                    logger.log(Level.INFO, "Added FEService worker № " + (workers.size() - 2));
+                }
+                worker.setAddress();
             }
         }
     }
@@ -47,8 +62,15 @@ public class SocketMessageServer implements SocketMessageServerMBean {
                 Message message = worker.pool();
                 if (message != null){
                     logger.log(Level.INFO, "Posting the message: " + message.toString());
-                    for (MessageWorker addresse : workers) {
-                        addresse.send(message);
+                    for (SocketMessageWorker addresse : workersDB) {
+                        if (message.getTo().equals(addresse.getAddress())) {
+                            addresse.send(message);
+                        }
+                    }
+                    for (SocketMessageWorker addresse : workersFE) {
+                        if (message.getTo().equals(addresse.getAddress())) {
+                            addresse.send(message);
+                        }
                     }
                     message = worker.pool();
                 }
@@ -72,4 +94,5 @@ public class SocketMessageServer implements SocketMessageServerMBean {
             excecutorService.shutdown();
         }
     }
+
 }

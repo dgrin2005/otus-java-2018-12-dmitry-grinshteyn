@@ -5,6 +5,7 @@ import ru.otus.DataSet.PhoneDataSet;
 import ru.otus.DataSet.UserDataSet;
 import ru.otus.FEWorker.FEServiceCallable;
 import ru.otus.MessageDto;
+import ru.otus.messages.DBMessage;
 import ru.otus.messages.FEMessage;
 import ru.otus.messages.Message;
 import ru.otus.workers.SocketMessageWorker;
@@ -23,14 +24,16 @@ public class FrontEndService {
 
     private final static Logger logger = Logger.getLogger(FrontEndService.class.getName());
     private SocketMessageWorker client;
+    private final int index;
     private final ConcurrentHashMap<UUID, LinkedBlockingQueue<Message>> uuidLinkedBlockingQueueConcurrentHashMap;
 
-    public FrontEndService() {
+    public FrontEndService(int index) {
+        this.index = index;
         this.uuidLinkedBlockingQueueConcurrentHashMap = new ConcurrentHashMap<>();
     }
 
     private void start() throws InterruptedException, IOException {
-        client = new ClientSocketMessageWorker(HOST, PORT);
+        client = new ClientSocketMessageWorker(HOST, PORT_MS, index);
         client.init();
         logger.log(Level.INFO, "Start FE client");
         ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
@@ -45,15 +48,15 @@ public class FrontEndService {
 
     public Message sendMessage(String messageId, UserDataSet userDataSet, UUID uuid) {
         if (messageId.equals(MESSAGE_ID_CREATE_NEW_USER)) {
-            Message message = new FEMessage(feAddress, dbAddress, MESSAGE_ID_CREATE_NEW_USER,
+            Message message = new FEMessage(client.getAddress(), client.getCorrespondentAddress(DBMessage.class, client.getAddress().getId()), MESSAGE_ID_CREATE_NEW_USER,
                     uuid,
                     new MessageDto(userDataSet.getId(),
                             userDataSet.getName(),
                             userDataSet.getAge(),
                             userDataSet.getAddress().getStreet(),
                             userDataSet.getPhones().stream()
-                            .map(PhoneDataSet::getNumber)
-                            .collect(Collectors.joining(", ")),
+                                    .map(PhoneDataSet::getNumber)
+                                    .collect(Collectors.joining(", ")),
                             ""));
             return sendAndWaitMessage(message, uuid);
         }
@@ -62,26 +65,25 @@ public class FrontEndService {
 
     public Message sendMessage(String messageId, UUID uuid) {
         if (messageId.equals(MESSAGE_ID_USER_LIST)) {
-            Message message = new FEMessage(feAddress, dbAddress, MESSAGE_ID_USER_LIST,
+            Message message = new FEMessage(client.getAddress(), client.getCorrespondentAddress(DBMessage.class, client.getAddress().getId()), MESSAGE_ID_USER_LIST,
                     uuid,
                     new MessageDto(""));
-                    return sendAndWaitMessage(message, uuid);
-
+            return sendAndWaitMessage(message, uuid);
         }
         return null;
     }
 
     public Message sendMessage(String messageId, long userId, UUID uuid) {
         if (messageId.equals(MESSAGE_ID_DELETE_USER)) {
-            Message message = new FEMessage(feAddress, dbAddress, MESSAGE_ID_DELETE_USER,
+            Message message = new FEMessage(client.getAddress(), client.getCorrespondentAddress(DBMessage.class, client.getAddress().getId()), MESSAGE_ID_DELETE_USER,
                     uuid,
                     new MessageDto(userId, "", ""));
             return sendAndWaitMessage(message, uuid);
         }
         if (messageId.equals(MESSAGE_ID_FIND_USER)) {
-            Message message = new FEMessage(feAddress, dbAddress, MESSAGE_ID_FIND_USER,
-                            uuid,
-                            new MessageDto(userId,"", ""));
+            Message message = new FEMessage(client.getAddress(), client.getCorrespondentAddress(DBMessage.class, client.getAddress().getId()), MESSAGE_ID_FIND_USER,
+                    uuid,
+                    new MessageDto(userId,"", ""));
             return sendAndWaitMessage(message, uuid);
         }
         return null;
