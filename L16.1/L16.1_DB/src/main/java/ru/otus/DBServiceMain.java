@@ -12,6 +12,7 @@ import ru.otus.DataSet.AddressDataSet;
 import ru.otus.DataSet.PhoneDataSet;
 import ru.otus.DataSet.UserDataSet;
 import ru.otus.Exception.MyOrmException;
+import ru.otus.exception.MyMSException;
 import ru.otus.workers.SocketMessageWorker;
 import ru.otus.DBWorker.*;
 import ru.otus.workers.WorkerActions;
@@ -51,22 +52,26 @@ public class DBServiceMain {
         }
     }
 
-    private void start(DBService dbService) throws InterruptedException, IOException {
-        client = new ClientSocketMessageWorker(HOST, PORT_MS);
-        client.init();
-        logger.log(Level.INFO, "Start DB client");
-        ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        WorkerActions dbServiceActions = new WorkerActions();
-        dbServiceActions.addAction(MESSAGE_ID_USER_LIST, new ActionGetUserList());
-        dbServiceActions.addAction(MESSAGE_ID_CREATE_NEW_USER, new ActionCreateNewUser());
-        dbServiceActions.addAction(MESSAGE_ID_FIND_USER, new ActionFindUser());
-        dbServiceActions.addAction(MESSAGE_ID_DELETE_USER, new ActionDeleteUser());
-        Callable<Integer> callable = new DBServiceCallable(dbService, client, dbServiceActions);
-        executorService.submit(callable);
-        executorService.shutdown();
+    private void start(DBService dbService) throws MyMSException {
+        try {
+            client = new ClientSocketMessageWorker(HOST, PORT_MS);
+            client.init();
+            logger.log(Level.INFO, "Start DB client");
+            ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+            WorkerActions dbServiceActions = new WorkerActions();
+            dbServiceActions.addAction(MESSAGE_ID_USER_LIST, new ActionGetUserList());
+            dbServiceActions.addAction(MESSAGE_ID_CREATE_NEW_USER, new ActionCreateNewUser());
+            dbServiceActions.addAction(MESSAGE_ID_FIND_USER, new ActionFindUser());
+            dbServiceActions.addAction(MESSAGE_ID_DELETE_USER, new ActionDeleteUser());
+            Callable<Integer> callable = new DBServiceCallable(dbService, client, dbServiceActions);
+            executorService.submit(callable);
+            executorService.shutdown();
+        } catch (IOException e) {
+            throw new MyMSException(e.getMessage(), e);
+        }
     }
 
-    private void destroy() throws IOException {
+    private void destroy() throws MyMSException {
         client.close();
     }
 

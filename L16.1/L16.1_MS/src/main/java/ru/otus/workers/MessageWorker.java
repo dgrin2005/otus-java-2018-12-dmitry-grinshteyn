@@ -1,5 +1,6 @@
 package ru.otus.workers;
 
+import ru.otus.exception.MyMSException;
 import ru.otus.messages.Message;
 
 import java.io.IOException;
@@ -10,7 +11,7 @@ public interface MessageWorker {
 
     void send(Message message);
 
-    Message take() throws InterruptedException;
+    Message take() throws MyMSException;
 
-    void close() throws IOException;
+    void close() throws MyMSException;
 }

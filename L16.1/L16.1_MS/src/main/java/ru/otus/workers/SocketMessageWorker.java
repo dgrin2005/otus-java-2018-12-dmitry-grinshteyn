@@ -3,6 +3,7 @@ package ru.otus.workers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import ru.otus.exception.MyMSException;
 import ru.otus.messages.Address;
 import ru.otus.messages.Message;
 
@@ -37,9 +38,21 @@ public class SocketMessageWorker implements MessageWorker {
         uuid = UUID.randomUUID();
     }
 
-    public void init() {
-        executorService.execute(this::sendMessage);
-        executorService.execute(this::receiveMessage);
+    public void init(){
+        executorService.execute(() -> {
+            try {
+                sendMessage();
+            } catch (MyMSException e) {
+                e.printStackTrace();
+            }
+        });
+        executorService.execute(() -> {
+            try {
+                receiveMessage();
+            } catch (MyMSException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
@@ -53,17 +66,25 @@ public class SocketMessageWorker implements MessageWorker {
     }
 
     @Override
-    public Message take() throws InterruptedException {
-        return input.take();
+    public Message take() throws MyMSException {
+        try {
+            return input.take();
+        } catch (InterruptedException e) {
+            throw new MyMSException(e.getMessage(), e);
+        }
     }
 
     @Override
-    public void close() throws IOException {
-        socket.close();
-        executorService.shutdown();
+    public void close() throws MyMSException {
+        try {
+            socket.close();
+            executorService.shutdown();
+        } catch (IOException e) {
+            throw new MyMSException(e.getMessage(), e);
+        }
     }
 
-    private void sendMessage(){
+    private void sendMessage() throws MyMSException {
         try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true)){
             while (socket.isConnected()){
                 Message message = output.take();
@@ -72,11 +93,11 @@ public class SocketMessageWorker implements MessageWorker {
                 out.println();
             }
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            throw new MyMSException(e.getMessage(), e);
         }
     }
 
-    private void receiveMessage(){
+    private void receiveMessage() throws MyMSException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))){
             String inputLine;
             StringBuilder stringBuilder = new StringBuilder();
@@ -89,18 +110,22 @@ public class SocketMessageWorker implements MessageWorker {
                     stringBuilder = new StringBuilder();
                 }
             }
-        }  catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+        }  catch (IOException e) {
+            throw new MyMSException(e.getMessage(), e);
         }
 
     }
 
-    private Message getMessageFromGson(String json) throws ClassNotFoundException {
-        JsonParser parser = new JsonParser();
-        JsonObject jsonObject = (JsonObject) parser.parse(json);
-        jsonObject = (JsonObject) jsonObject.get("from");
-        Class<?> messageClass = Class.forName(jsonObject.get("className").getAsString());
-        return new Gson().fromJson(json, (Type) messageClass);
+    private Message getMessageFromGson(String json) throws MyMSException {
+        try {
+            JsonParser parser = new JsonParser();
+            JsonObject jsonObject = (JsonObject) parser.parse(json);
+            jsonObject = (JsonObject) jsonObject.get("from");
+            Class<?> messageClass = Class.forName(jsonObject.get("className").getAsString());
+            return new Gson().fromJson(json, (Type) messageClass);
+        } catch (ClassNotFoundException e) {
+            throw new MyMSException(e.getMessage(), e);
+        }
     }
 
     public void setAddress(String className) {

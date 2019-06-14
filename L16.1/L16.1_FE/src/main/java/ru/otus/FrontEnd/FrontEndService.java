@@ -6,6 +6,7 @@ import ru.otus.DataSet.PhoneDataSet;
 import ru.otus.DataSet.UserDataSet;
 import ru.otus.FEWorker.FEServiceCallable;
 import ru.otus.MessageDto;
+import ru.otus.exception.MyMSException;
 import ru.otus.messages.Address;
 import ru.otus.messages.DBMessage;
 import ru.otus.messages.FEMessage;
@@ -33,7 +34,7 @@ public class FrontEndService {
         this.uuidLinkedBlockingQueueConcurrentHashMap = new ConcurrentHashMap<>();
     }
 
-    private void start() throws InterruptedException, IOException {
+    private void start() throws InterruptedException, IOException, MyMSException {
         client = new ClientSocketMessageWorker(HOST, PORT_MS);
         client.init();
         logger.log(Level.INFO, "Start FE client");
@@ -45,7 +46,7 @@ public class FrontEndService {
         executorService.shutdown();
     }
 
-    private void destroy() throws IOException {
+    private void destroy() throws IOException, MyMSException {
         client.close();
     }
 

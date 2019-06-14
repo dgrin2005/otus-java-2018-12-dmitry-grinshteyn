@@ -1,5 +1,6 @@
 package ru.otus.server;
 
+import ru.otus.exception.MyMSException;
 import ru.otus.messages.DBMessage;
 import ru.otus.messages.FEMessage;
 import ru.otus.messages.Message;
@@ -39,8 +40,14 @@ public class SocketMessageServer implements SocketMessageServerMBean {
         workers = new CopyOnWriteArrayList<>();
     }
 
-    public void start() throws Exception{
-        excecutorService.submit(this::post);
+    public void start() throws MyMSException{
+        excecutorService.submit(() -> {
+            try {
+                post();
+            } catch (MyMSException e) {
+                e.printStackTrace();
+            }
+        });
         try (ServerSocket serverSocket = new ServerSocket(PORT_MS)){
             while(!excecutorService.isShutdown()){
                 Socket socket = serverSocket.accept();
@@ -51,10 +58,12 @@ public class SocketMessageServer implements SocketMessageServerMBean {
                 worker.setAddress(((BufferedReader) reader).readLine());
                 logger.log(Level.INFO, "Added worker: " + worker);
             }
+        } catch (IOException e) {
+            throw new MyMSException(e.getMessage(), e);
         }
     }
 
-    private void post(){
+    private void post() throws MyMSException {
         while (true){
             for (MessageWorker worker : workers){
                 Message message = worker.pool();
@@ -67,9 +76,13 @@ public class SocketMessageServer implements SocketMessageServerMBean {
                             addressMap.get(worker).send(message);
                         } else {
                             MessageWorker correspondentWorker = findCorrespondentWorker((SocketMessageWorker) worker);
-                            addressMap.put(worker, correspondentWorker);
-                            addressMap.put(correspondentWorker, worker);
-                            correspondentWorker.send(message);
+                            if (correspondentWorker != null) {
+                                addressMap.put(worker, correspondentWorker);
+                                addressMap.put(correspondentWorker, worker);
+                                correspondentWorker.send(message);
+                            } else {
+                                logger.log(Level.WARNING, "Correspondent address for worker " + worker + " not found.");
+                            }
                         }
                     }
                     message = worker.pool();
@@ -77,8 +90,8 @@ public class SocketMessageServer implements SocketMessageServerMBean {
             }
             try {
                 Thread.sleep(DELAY_MS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                throw new MyMSException(e.getMessage(), e);
             }
         }
     }
