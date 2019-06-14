@@ -56,9 +56,9 @@ public class ServerMain {
         ScheduledExecutorService executorServiceDB2 = Executors.newSingleThreadScheduledExecutor();
         startClient(executorServiceDB2, DBSERVICE_START_COMMAND2,START_DELAY_SEC);
         ScheduledExecutorService executorServiceFE1 = Executors.newSingleThreadScheduledExecutor();
-        startClient(executorServiceFE1, FESERVICE_START_COMMAND1, START_DELAY_SEC * 2);
+        startClient(executorServiceFE1, FESERVICE_START_COMMAND1, START_DELAY_SEC);
         ScheduledExecutorService executorServiceFE2 = Executors.newSingleThreadScheduledExecutor();
-        startClient(executorServiceFE2, FESERVICE_START_COMMAND2, START_DELAY_SEC * 2);
+        startClient(executorServiceFE2, FESERVICE_START_COMMAND2, START_DELAY_SEC);
         MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
         ObjectName objectName = new ObjectName("ru.otus:type=Server");
         SocketMessageServer server = new SocketMessageServer();

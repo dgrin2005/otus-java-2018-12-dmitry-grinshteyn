@@ -1,16 +1,17 @@
 package ru.otus.server;
 
-import javafx.concurrent.Worker;
 import ru.otus.messages.DBMessage;
 import ru.otus.messages.FEMessage;
 import ru.otus.messages.Message;
 import ru.otus.workers.MessageWorker;
 import ru.otus.workers.SocketMessageWorker;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ import static ru.otus.ServerMain.PORT_MS;
 public class SocketMessageServer implements SocketMessageServerMBean {
     private final static Logger logger = Logger.getLogger(SocketMessageServer.class.getName());
     private final static int THREADS_COUNT = 1;
-    private final static int MIRROR_DELAY_MS = 100;
+    private final static int DELAY_MS = 100;
 
     private final ExecutorService excecutorService;
     private final List<MessageWorker> workers;
@@ -43,10 +44,11 @@ public class SocketMessageServer implements SocketMessageServerMBean {
         try (ServerSocket serverSocket = new ServerSocket(PORT_MS)){
             while(!excecutorService.isShutdown()){
                 Socket socket = serverSocket.accept();
+                Reader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 SocketMessageWorker worker = new SocketMessageWorker(socket);
                 worker.init();
                 workers.add(worker);
-                worker.setAddress();
+                worker.setAddress(((BufferedReader) reader).readLine());
                 logger.log(Level.INFO, "Added worker: " + worker);
             }
         }
@@ -74,7 +76,7 @@ public class SocketMessageServer implements SocketMessageServerMBean {
                 }
             }
             try {
-                Thread.sleep(MIRROR_DELAY_MS);
+                Thread.sleep(DELAY_MS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
