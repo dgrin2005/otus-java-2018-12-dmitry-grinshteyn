@@ -4,12 +4,17 @@ import ru.otus.DBInitialization.DBHibernateInitializationServiceImpl;
 import ru.otus.DBInitialization.DBInitializationService;
 import ru.otus.DBService.DBService;
 import ru.otus.DBService.DBServiceHibernateImpl;
+import ru.otus.DBWorker.Actions.ActionCreateNewUser;
+import ru.otus.DBWorker.Actions.ActionDeleteUser;
+import ru.otus.DBWorker.Actions.ActionFindUser;
+import ru.otus.DBWorker.Actions.ActionGetUserList;
 import ru.otus.DataSet.AddressDataSet;
 import ru.otus.DataSet.PhoneDataSet;
 import ru.otus.DataSet.UserDataSet;
 import ru.otus.Exception.MyOrmException;
 import ru.otus.workers.SocketMessageWorker;
 import ru.otus.DBWorker.*;
+import ru.otus.workers.WorkerActions;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
@@ -19,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static ru.otus.ServerMain.*;
+import static ru.otus.messages.Message.*;
 
 public class DBServiceMain {
 
@@ -35,7 +41,7 @@ public class DBServiceMain {
             DBInitializationService dbInitializationService = new DBHibernateInitializationServiceImpl(dbService);
             dbInitializationService.initData();
 
-            new DBServiceMain().start(dbService, Integer.parseInt(args[1]));
+            new DBServiceMain().start(dbService);
 
             while (true) {
             }
@@ -45,12 +51,17 @@ public class DBServiceMain {
         }
     }
 
-    private void start(DBService dbService, int index) throws InterruptedException, IOException {
-        client = new ClientSocketMessageWorker(HOST, PORT_MS, index);
+    private void start(DBService dbService) throws InterruptedException, IOException {
+        client = new ClientSocketMessageWorker(HOST, PORT_MS);
         client.init();
         logger.log(Level.INFO, "Start DB client");
         ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        Callable<Integer> callable = new DBServiceCallable(dbService, client);
+        WorkerActions dbServiceActions = new WorkerActions();
+        dbServiceActions.addAction(MESSAGE_ID_USER_LIST, new ActionGetUserList());
+        dbServiceActions.addAction(MESSAGE_ID_CREATE_NEW_USER, new ActionCreateNewUser());
+        dbServiceActions.addAction(MESSAGE_ID_FIND_USER, new ActionFindUser());
+        dbServiceActions.addAction(MESSAGE_ID_DELETE_USER, new ActionDeleteUser());
+        Callable<Integer> callable = new DBServiceCallable(dbService, client, dbServiceActions);
         executorService.submit(callable);
         executorService.shutdown();
     }

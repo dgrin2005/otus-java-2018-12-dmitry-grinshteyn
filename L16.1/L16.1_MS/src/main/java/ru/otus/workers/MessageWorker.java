@@ -5,6 +5,7 @@ import ru.otus.messages.Message;
 import java.io.IOException;
 
 public interface MessageWorker {
+
     Message pool();
 
     void send(Message message);

@@ -14,9 +14,11 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.net.Socket;
+import java.util.UUID;
 import java.util.concurrent.*;
 
 public class SocketMessageWorker implements MessageWorker {
+    private UUID uuid;
     private final static int WORKER_COUNT = 2;
     private final ExecutorService executorService;
     private final Socket socket;
@@ -28,12 +30,14 @@ public class SocketMessageWorker implements MessageWorker {
     public SocketMessageWorker(Socket socket) {
         this.socket = socket;
         executorService = Executors.newFixedThreadPool(WORKER_COUNT);
+        uuid = UUID.randomUUID();
     }
 
     public SocketMessageWorker(Socket socket, Address address) {
         this.socket = socket;
         this.address = address;
         executorService = Executors.newFixedThreadPool(WORKER_COUNT);
+        uuid = UUID.randomUUID();
     }
 
     public void init() {
@@ -103,10 +107,10 @@ public class SocketMessageWorker implements MessageWorker {
     }
 
     public void setAddress() {
-        if (counter<2) {
-            this.address = new Address(DBMessage.class.getName(), counter);
+        if (counter < 2) {
+            this.address = new Address(DBMessage.class.getName());
         } else {
-            this.address = new Address(FEMessage.class.getName(), counter - 2);
+            this.address = new Address(FEMessage.class.getName());
         }
         counter++;
     }
@@ -115,14 +119,15 @@ public class SocketMessageWorker implements MessageWorker {
         return address;
     }
 
-    public Address getCorrespondentAddress(Class className, int index) {
-        return new Address(className.getName(), index);
+    public UUID getUuid() {
+        return uuid;
     }
 
     @Override
     public String toString() {
         return "SocketMessageWorker{" +
                 "address=" + address +
+                ", uuid=" + uuid +
                 '}';
     }
 }

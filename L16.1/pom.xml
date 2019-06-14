@@ -5,19 +5,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>ru.otus</groupId>
-  <artifactId>L16.1</artifactId>
+  <artifactId>l16.1</artifactId>
   <version>1.0-SNAPSHOT</version>
   <modules>
-    <module>L16.1_MS</module>
-    <module>L16.1_DB</module>
-    <module>L16.1_FE_1</module>
-    <module>L16.1_FE_2</module>
+    <module>l16.1_ms</module>
+    <module>l16.1_db</module>
+    <module>l16.1_fe</module>
   </modules>
 
-  <name>OTUS_HW_16</name>
+  <name>otus_hw_16</name>
   <description>OTUS Homework 16.1</description>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
   <packaging>pom</packaging>
 
   <developers>

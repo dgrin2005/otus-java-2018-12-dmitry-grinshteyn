@@ -11,12 +11,12 @@ public class ClientSocketMessageWorker extends SocketMessageWorker {
 
     private final Socket socket;
 
-    public ClientSocketMessageWorker(String host, int port, int index) throws IOException {
-        this(new Socket(host, port), index);
+    public ClientSocketMessageWorker(String host, int port) throws IOException {
+        this(new Socket(host, port));
     }
 
-    private ClientSocketMessageWorker(Socket socket, int index) {
-        super(socket, new Address(DBMessage.class.getName(), index));
+    private ClientSocketMessageWorker(Socket socket) {
+        super(socket, new Address(DBMessage.class.getName()));
         this.socket = socket;
     }
 

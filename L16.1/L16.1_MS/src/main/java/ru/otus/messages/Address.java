@@ -3,11 +3,9 @@ package ru.otus.messages;
 public class Address {
 
     private final String className;
-    private final int id;
 
-    public Address(String className, int id) {
+    public Address(String className) {
         this.className = className;
-        this.id = id;
     }
 
     @Override
@@ -17,7 +15,7 @@ public class Address {
 
         Address address = (Address) o;
 
-        return className != null ? (className.equals(address.className) && id == address.id) : address.className == null;
+        return className != null ? (className.equals(address.className)) : address.className == null;
     }
 
     @Override
@@ -29,15 +27,10 @@ public class Address {
         return className;
     }
 
-    public int getId() {
-        return id;
-    }
-
     @Override
     public String toString() {
         return "Address{" +
                 "className='" + className + '\'' +
-                "id='" + id + '\'' +
                 '}';
     }
 }

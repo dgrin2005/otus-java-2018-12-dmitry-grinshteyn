@@ -1,5 +1,8 @@
 package ru.otus.server;
 
+import javafx.concurrent.Worker;
+import ru.otus.messages.DBMessage;
+import ru.otus.messages.FEMessage;
 import ru.otus.messages.Message;
 import ru.otus.workers.MessageWorker;
 import ru.otus.workers.SocketMessageWorker;
@@ -8,7 +11,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,15 +30,12 @@ public class SocketMessageServer implements SocketMessageServerMBean {
     private final ExecutorService excecutorService;
     private final List<MessageWorker> workers;
 
-    private List<SocketMessageWorker> workersDB;
-    private List<SocketMessageWorker> workersFE;
+    private Map<MessageWorker, MessageWorker> addressMap = new HashMap<>();
 
     public SocketMessageServer() throws IOException {
         logger.log(Level.INFO, "Start server");
         excecutorService = Executors.newFixedThreadPool(THREADS_COUNT);
         workers = new CopyOnWriteArrayList<>();
-        workersDB = new ArrayList<>();
-        workersFE = new ArrayList<>();
     }
 
     public void start() throws Exception{
@@ -44,14 +46,8 @@ public class SocketMessageServer implements SocketMessageServerMBean {
                 SocketMessageWorker worker = new SocketMessageWorker(socket);
                 worker.init();
                 workers.add(worker);
-                if (workers.size() <= 2) {
-                    workersDB.add(worker);
-                    logger.log(Level.INFO, "Added DBService worker № " + workers.size());
-                } else {
-                    workersFE.add(worker);
-                    logger.log(Level.INFO, "Added FEService worker № " + (workers.size() - 2));
-                }
                 worker.setAddress();
+                logger.log(Level.INFO, "Added worker: " + worker);
             }
         }
     }
@@ -62,14 +58,16 @@ public class SocketMessageServer implements SocketMessageServerMBean {
                 Message message = worker.pool();
                 if (message != null){
                     logger.log(Level.INFO, "Posting the message: " + message.toString());
-                    for (SocketMessageWorker addresse : workersDB) {
-                        if (message.getTo().equals(addresse.getAddress())) {
-                            addresse.send(message);
-                        }
-                    }
-                    for (SocketMessageWorker addresse : workersFE) {
-                        if (message.getTo().equals(addresse.getAddress())) {
-                            addresse.send(message);
+                    if (message.getFrom().equals(message.getTo())) {
+                        worker.send(message);
+                    } else {
+                        if (addressMap.containsKey(worker)) {
+                            addressMap.get(worker).send(message);
+                        } else {
+                            MessageWorker correspondentWorker = findCorrespondentWorker((SocketMessageWorker) worker);
+                            addressMap.put(worker, correspondentWorker);
+                            addressMap.put(correspondentWorker, worker);
+                            correspondentWorker.send(message);
                         }
                     }
                     message = worker.pool();
@@ -93,6 +91,34 @@ public class SocketMessageServer implements SocketMessageServerMBean {
         if (!running){
             excecutorService.shutdown();
         }
+    }
+
+    private MessageWorker findCorrespondentWorker(SocketMessageWorker worker) {
+        SocketMessageWorker correspondentWorker = null;
+        String correspondentClassName = "";
+        if (getWorkerClassName(worker).equals(FEMessage.class.getName())) {
+            correspondentClassName = DBMessage.class.getName();
+        } else {
+            if (getWorkerClassName(worker).equals(DBMessage.class.getName())) {
+                correspondentClassName = FEMessage.class.getName();
+            }
+        }
+        if (!correspondentClassName.isEmpty()) {
+            int i = 0;
+            while (correspondentWorker == null || i < workers.size()) {
+                SocketMessageWorker currentWorker = (SocketMessageWorker) workers.get(i);
+                if (getWorkerClassName(currentWorker).equals(correspondentClassName) &&
+                        !addressMap.containsKey(currentWorker)) {
+                    correspondentWorker = currentWorker;
+                }
+                i++;
+            }
+        }
+        return correspondentWorker;
+    }
+
+    private String getWorkerClassName(SocketMessageWorker worker) {
+        return worker.getAddress().getClassName();
     }
 
 }
