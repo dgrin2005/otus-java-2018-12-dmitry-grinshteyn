@@ -136,10 +136,6 @@ public class SocketMessageWorker implements MessageWorker {
         return address;
     }
 
-    public UUID getUuid() {
-        return uuid;
-    }
-
     @Override
     public String toString() {
         return "SocketMessageWorker{" +

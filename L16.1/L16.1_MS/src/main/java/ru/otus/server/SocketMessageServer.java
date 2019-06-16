@@ -34,7 +34,7 @@ public class SocketMessageServer implements SocketMessageServerMBean {
 
     private Map<MessageWorker, MessageWorker> addressMap = new HashMap<>();
 
-    public SocketMessageServer() throws IOException {
+    public SocketMessageServer() {
         logger.log(Level.INFO, "Start server");
         excecutorService = Executors.newFixedThreadPool(THREADS_COUNT);
         workers = new CopyOnWriteArrayList<>();
@@ -81,7 +81,7 @@ public class SocketMessageServer implements SocketMessageServerMBean {
                                 addressMap.put(correspondentWorker, worker);
                                 correspondentWorker.send(message);
                             } else {
-                                logger.log(Level.WARNING, "Correspondent address for worker " + worker + " not found.");
+                                throw new MyMSException("Correspondent address not found for worker " + worker);
                             }
                         }
                     }

@@ -4,7 +4,7 @@ import ru.otus.FEWorker.Actions.ActionShowPage;
 import ru.otus.FEWorker.ClientSocketMessageWorker;
 import ru.otus.DataSet.PhoneDataSet;
 import ru.otus.DataSet.UserDataSet;
-import ru.otus.FEWorker.FEServiceCallable;
+import ru.otus.FEWorker.FEServiceRunnable;
 import ru.otus.MessageDto;
 import ru.otus.exception.MyMSException;
 import ru.otus.messages.Address;
@@ -41,8 +41,8 @@ public class FrontEndService {
         ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         WorkerActions feServiceActions = new WorkerActions();
         feServiceActions.addAction(MESSAGE_ID_SHOW_PAGE, new ActionShowPage());
-        Callable<Integer> callable = new FEServiceCallable(this, client, feServiceActions);
-        executorService.submit(callable);
+        Runnable runnable = new FEServiceRunnable(this, client, feServiceActions);
+        executorService.submit(runnable);
         executorService.shutdown();
     }
 

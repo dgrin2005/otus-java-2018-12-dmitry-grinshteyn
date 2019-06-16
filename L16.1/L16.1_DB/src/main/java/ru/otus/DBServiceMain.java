@@ -18,7 +18,6 @@ import ru.otus.DBWorker.*;
 import ru.otus.workers.WorkerActions;
 
 import java.io.IOException;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -63,8 +62,8 @@ public class DBServiceMain {
             dbServiceActions.addAction(MESSAGE_ID_CREATE_NEW_USER, new ActionCreateNewUser());
             dbServiceActions.addAction(MESSAGE_ID_FIND_USER, new ActionFindUser());
             dbServiceActions.addAction(MESSAGE_ID_DELETE_USER, new ActionDeleteUser());
-            Callable<Integer> callable = new DBServiceCallable(dbService, client, dbServiceActions);
-            executorService.submit(callable);
+            Runnable runnable = new DBServiceRunnable(dbService, client, dbServiceActions);
+            executorService.submit(runnable);
             executorService.shutdown();
         } catch (IOException e) {
             throw new MyMSException(e.getMessage(), e);
