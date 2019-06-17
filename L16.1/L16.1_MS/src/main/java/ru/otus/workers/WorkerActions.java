@@ -5,6 +5,7 @@ import ru.otus.messages.Message;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class WorkerActions {
@@ -15,12 +16,8 @@ public class WorkerActions {
         this.actionMap = new HashMap<>();
     }
 
-    public Consumer getAction(Message message) throws MyMSException {
-        if (actionMap.containsKey(message.getMessageId())) {
-            return actionMap.get(message.getMessageId());
-        } else {
-            throw new MyMSException("Action not found for message " + message);
-        }
+    public Optional<Consumer> getAction(Message message) {
+        return Optional.ofNullable(actionMap.get(message.getMessageId()));
     }
 
     public void addAction(String name, Consumer consumer) {

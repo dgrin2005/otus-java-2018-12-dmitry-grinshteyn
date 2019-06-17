@@ -1,6 +1,6 @@
-package ru.otus.DataSet;
+package ru.otus.dataset;
 
-import ru.otus.DataSet.Dto.UserDataSetDto;
+import ru.otus.dataset.dto.UserDataSetDto;
 
 import javax.persistence.*;
 import java.util.ArrayList;

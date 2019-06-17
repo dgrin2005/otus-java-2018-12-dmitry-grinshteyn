@@ -1,4 +1,4 @@
-package ru.otus.DBService;
+package ru.otus.dbservice;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -6,10 +6,10 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
-import ru.otus.DAO.DataSetDAO;
-import ru.otus.DAO.DataSetDAOHibernateImpl;
-import ru.otus.DataSet.DataSet;
-import ru.otus.Exception.MyOrmException;
+import ru.otus.dao.DataSetDAO;
+import ru.otus.dao.DataSetDAOHibernateImpl;
+import ru.otus.dataset.DataSet;
+import ru.otus.exception.MyOrmException;
 
 import java.util.List;
 

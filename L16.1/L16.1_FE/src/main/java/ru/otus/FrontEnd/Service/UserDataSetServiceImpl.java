@@ -1,8 +1,8 @@
-package ru.otus.FrontEnd.Service;
+package ru.otus.frontend.service;
 
-import ru.otus.DataSet.UserDataSet;
-import ru.otus.DataSet.Dto.UserDataSetDto;
-import ru.otus.FrontEnd.FrontEndService;
+import ru.otus.dataset.UserDataSet;
+import ru.otus.dataset.dto.UserDataSetDto;
+import ru.otus.frontend.FrontEndService;
 import ru.otus.MessageDto;
 import ru.otus.messages.DBMessage;
 
@@ -12,9 +12,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static ru.otus.FrontEnd.FrontEndUtilites.*;
-import static ru.otus.FrontEnd.FrontEndUtilites.setErrorMessageToMap;
-import static ru.otus.FrontEnd.FrontEndUtilites.setUserListToMap;
+import static ru.otus.frontend.FrontEndUtilites.*;
+import static ru.otus.frontend.FrontEndUtilites.setErrorMessageToMap;
+import static ru.otus.frontend.FrontEndUtilites.setUserListToMap;
 import static ru.otus.messages.Message.*;
 
 public class UserDataSetServiceImpl implements UserDataSetService {

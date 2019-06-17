@@ -1,12 +1,14 @@
-package ru.otus.FEWorker;
+package ru.otus.feworker;
 
-import ru.otus.FEWorker.Actions.FEServiceActionsParameters;
-import ru.otus.FrontEnd.FrontEndService;
+import ru.otus.feworker.actions.FEServiceActionsParameters;
+import ru.otus.frontend.FrontEndService;
 import ru.otus.exception.MyMSException;
 import ru.otus.messages.Message;
 import ru.otus.workers.SocketMessageWorker;
 import ru.otus.workers.WorkerActions;
 
+import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +33,10 @@ public class FEServiceRunnable implements Runnable {
             try {
                 Message msg = client.take();
                 logger.log(Level.INFO, "FE Message received: " + msg.toString());
-                feServiceActions.getAction(msg).accept(new FEServiceActionsParameters(msg, frontEndService));
+                Optional<Consumer> optionalAction = feServiceActions.getAction(msg);
+                Consumer action = optionalAction.orElseThrow(() ->
+                        new MyMSException("Action not found for message " + msg));
+                action.accept(new FEServiceActionsParameters(msg, frontEndService));
             } catch (MyMSException e) {
                 e.printStackTrace();
             }

@@ -1,4 +1,4 @@
-package ru.otus.FrontEnd.Service;
+package ru.otus.frontend.service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;

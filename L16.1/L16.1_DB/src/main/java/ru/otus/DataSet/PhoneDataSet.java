@@ -1,4 +1,4 @@
-package ru.otus.DataSet;
+package ru.otus.dataset;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;

@@ -1,8 +1,8 @@
-package ru.otus.Executor;
+package ru.otus.executor;
 
 import org.hibernate.Session;
-import ru.otus.DataSet.DataSet;
-import ru.otus.Exception.MyOrmException;
+import ru.otus.dataset.DataSet;
+import ru.otus.exception.MyOrmException;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;

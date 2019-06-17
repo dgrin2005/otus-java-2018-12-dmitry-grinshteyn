@@ -1,7 +1,7 @@
-package ru.otus.DAO;
+package ru.otus.dao;
 
-import ru.otus.DataSet.DataSet;
-import ru.otus.Exception.MyOrmException;
+import ru.otus.dataset.DataSet;
+import ru.otus.exception.MyOrmException;
 
 import java.util.List;
 

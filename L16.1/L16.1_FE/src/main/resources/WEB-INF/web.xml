@@ -11,7 +11,7 @@
 
     <servlet>
         <servlet-name>userDataSetServlet</servlet-name>
-        <servlet-class>ru.otus.FrontEnd.UserDataSetServlet</servlet-class>
+        <servlet-class>ru.otus.frontend.UserDataSetServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

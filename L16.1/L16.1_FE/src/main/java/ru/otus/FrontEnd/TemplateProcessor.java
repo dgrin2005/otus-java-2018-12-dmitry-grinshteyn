@@ -1,4 +1,4 @@
-package ru.otus.FrontEnd;
+package ru.otus.frontend;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -9,7 +9,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
 
-import static ru.otus.FrontEnd.FrontEndUtilites.TEMPLATE_PATH_RESOURCE;
+import static ru.otus.frontend.FrontEndUtilites.TEMPLATE_PATH_RESOURCE;
 
 class TemplateProcessor {
     private final Configuration configuration;

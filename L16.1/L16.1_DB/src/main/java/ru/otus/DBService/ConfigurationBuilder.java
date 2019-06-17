@@ -1,4 +1,4 @@
-package ru.otus.DBService;
+package ru.otus.dbservice;
 
 import org.hibernate.cfg.Configuration;
 

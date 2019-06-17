@@ -1,10 +1,10 @@
-package ru.otus.FrontEnd;
+package ru.otus.frontend;
 
-import ru.otus.FEWorker.Actions.ActionShowPage;
-import ru.otus.FEWorker.ClientSocketMessageWorker;
-import ru.otus.DataSet.PhoneDataSet;
-import ru.otus.DataSet.UserDataSet;
-import ru.otus.FEWorker.FEServiceRunnable;
+import ru.otus.feworker.actions.ActionShowPage;
+import ru.otus.feworker.ClientSocketMessageWorker;
+import ru.otus.dataset.PhoneDataSet;
+import ru.otus.dataset.UserDataSet;
+import ru.otus.feworker.FEServiceRunnable;
 import ru.otus.MessageDto;
 import ru.otus.exception.MyMSException;
 import ru.otus.messages.Address;

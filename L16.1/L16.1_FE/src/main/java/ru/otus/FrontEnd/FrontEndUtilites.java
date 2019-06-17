@@ -1,9 +1,9 @@
-package ru.otus.FrontEnd;
+package ru.otus.frontend;
 
-import ru.otus.DataSet.AddressDataSet;
-import ru.otus.DataSet.PhoneDataSet;
-import ru.otus.DataSet.UserDataSet;
-import ru.otus.DataSet.Dto.UserDataSetDto;
+import ru.otus.dataset.AddressDataSet;
+import ru.otus.dataset.PhoneDataSet;
+import ru.otus.dataset.UserDataSet;
+import ru.otus.dataset.dto.UserDataSetDto;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;

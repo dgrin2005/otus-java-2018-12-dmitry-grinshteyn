@@ -3,10 +3,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <bean id="frontEndService" class="ru.otus.FrontEnd.FrontEndService" init-method="start" destroy-method="destroy">
+    <bean id="frontEndService" class="ru.otus.frontend.FrontEndService" init-method="start" destroy-method="destroy">
     </bean>
 
-    <bean id="userDataSetService" class="ru.otus.FrontEnd.Service.UserDataSetServiceImpl">
+    <bean id="userDataSetService" class="ru.otus.frontend.service.UserDataSetServiceImpl">
         <constructor-arg ref="frontEndService"/>
     </bean>
 

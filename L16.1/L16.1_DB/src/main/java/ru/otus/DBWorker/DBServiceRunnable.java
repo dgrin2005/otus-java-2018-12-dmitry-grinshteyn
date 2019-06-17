@@ -1,12 +1,14 @@
-package ru.otus.DBWorker;
+package ru.otus.dbworker;
 
-import ru.otus.DBService.DBService;
-import ru.otus.DBWorker.Actions.DBServiceActionsParameters;
+import ru.otus.dbservice.DBService;
+import ru.otus.dbworker.actions.DBServiceActionsParameters;
 import ru.otus.exception.MyMSException;
 import ru.otus.messages.Message;
 import ru.otus.workers.SocketMessageWorker;
 import ru.otus.workers.WorkerActions;
 
+import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +33,10 @@ public class DBServiceRunnable implements Runnable {
             try {
                 Message msg = client.take();
                 logger.log(Level.INFO, "DB Message received: " + msg.toString());
-                dbServiceActions.getAction(msg).accept(new DBServiceActionsParameters(msg, dbService, client));
+                Optional<Consumer> optionalAction = dbServiceActions.getAction(msg);
+                Consumer action = optionalAction.orElseThrow(() ->
+                        new MyMSException("Action not found for message " + msg));
+                action.accept(new DBServiceActionsParameters(msg, dbService, client));
             } catch (MyMSException e) {
                 e.printStackTrace();
             }

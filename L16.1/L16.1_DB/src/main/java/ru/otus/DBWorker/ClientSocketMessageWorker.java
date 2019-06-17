@@ -1,4 +1,4 @@
-package ru.otus.DBWorker;
+package ru.otus.dbworker;
 
 import ru.otus.exception.MyMSException;
 import ru.otus.messages.Address;

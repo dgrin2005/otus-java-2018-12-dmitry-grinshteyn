@@ -1,4 +1,4 @@
-package ru.otus.Exception;
+package ru.otus.exception;
 
 public class MyOrmException extends Exception {
 

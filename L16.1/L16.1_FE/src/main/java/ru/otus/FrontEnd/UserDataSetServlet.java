@@ -1,8 +1,8 @@
-package ru.otus.FrontEnd;
+package ru.otus.frontend;
 
 import org.springframework.context.ApplicationContext;
-import ru.otus.FrontEnd.Service.UserDataSetService;
-import ru.otus.FrontEnd.Service.UserDataSetServiceImpl;
+import ru.otus.frontend.service.UserDataSetService;
+import ru.otus.frontend.service.UserDataSetServiceImpl;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
-import static ru.otus.FrontEnd.FrontEndUtilites.*;
+import static ru.otus.frontend.FrontEndUtilites.*;
 
 public class UserDataSetServlet extends HttpServlet {
 

@@ -1,7 +1,7 @@
-package ru.otus.DataSet.Dto;
+package ru.otus.dataset.dto;
 
-import ru.otus.DataSet.PhoneDataSet;
-import ru.otus.DataSet.UserDataSet;
+import ru.otus.dataset.PhoneDataSet;
+import ru.otus.dataset.UserDataSet;
 import ru.otus.MessageDto;
 
 import java.util.stream.Collectors;

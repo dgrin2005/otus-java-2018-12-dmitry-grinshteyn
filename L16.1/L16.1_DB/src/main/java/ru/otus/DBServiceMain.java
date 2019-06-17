@@ -1,20 +1,20 @@
 package ru.otus;
 
-import ru.otus.DBInitialization.DBHibernateInitializationServiceImpl;
-import ru.otus.DBInitialization.DBInitializationService;
-import ru.otus.DBService.DBService;
-import ru.otus.DBService.DBServiceHibernateImpl;
-import ru.otus.DBWorker.Actions.ActionCreateNewUser;
-import ru.otus.DBWorker.Actions.ActionDeleteUser;
-import ru.otus.DBWorker.Actions.ActionFindUser;
-import ru.otus.DBWorker.Actions.ActionGetUserList;
-import ru.otus.DataSet.AddressDataSet;
-import ru.otus.DataSet.PhoneDataSet;
-import ru.otus.DataSet.UserDataSet;
-import ru.otus.Exception.MyOrmException;
+import ru.otus.dbinitialization.DBHibernateInitializationServiceImpl;
+import ru.otus.dbinitialization.DBInitializationService;
+import ru.otus.dbservice.DBService;
+import ru.otus.dbservice.DBServiceHibernateImpl;
+import ru.otus.dbworker.actions.ActionCreateNewUser;
+import ru.otus.dbworker.actions.ActionDeleteUser;
+import ru.otus.dbworker.actions.ActionFindUser;
+import ru.otus.dbworker.actions.ActionGetUserList;
+import ru.otus.dataset.AddressDataSet;
+import ru.otus.dataset.PhoneDataSet;
+import ru.otus.dataset.UserDataSet;
+import ru.otus.exception.MyOrmException;
 import ru.otus.exception.MyMSException;
 import ru.otus.workers.SocketMessageWorker;
-import ru.otus.DBWorker.*;
+import ru.otus.dbworker.*;
 import ru.otus.workers.WorkerActions;
 
 import java.io.IOException;

@@ -1,9 +1,9 @@
-package ru.otus.DBWorker.Actions;
+package ru.otus.dbworker.actions;
 
-import ru.otus.DBService.DBService;
-import ru.otus.DataSet.PhoneDataSet;
-import ru.otus.DataSet.UserDataSet;
-import ru.otus.Exception.MyOrmException;
+import ru.otus.dbservice.DBService;
+import ru.otus.dataset.PhoneDataSet;
+import ru.otus.dataset.UserDataSet;
+import ru.otus.exception.MyOrmException;
 import ru.otus.MessageDto;
 import ru.otus.messages.Address;
 import ru.otus.messages.DBMessage;

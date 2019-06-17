@@ -1,4 +1,4 @@
-package ru.otus.DBInitialization;
+package ru.otus.dbinitialization;
 
 public interface DBInitializationService {
 

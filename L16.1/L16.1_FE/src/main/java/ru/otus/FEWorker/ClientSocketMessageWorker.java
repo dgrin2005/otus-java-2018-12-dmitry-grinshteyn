@@ -1,4 +1,4 @@
-package ru.otus.FEWorker;
+package ru.otus.feworker;
 
 import ru.otus.exception.MyMSException;
 import ru.otus.messages.Address;

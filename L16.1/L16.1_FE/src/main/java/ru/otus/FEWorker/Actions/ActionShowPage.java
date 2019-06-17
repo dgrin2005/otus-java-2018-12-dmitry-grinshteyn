@@ -1,6 +1,6 @@
-package ru.otus.FEWorker.Actions;
+package ru.otus.feworker.actions;
 
-import ru.otus.FrontEnd.FrontEndService;
+import ru.otus.frontend.FrontEndService;
 import ru.otus.messages.Message;
 
 import java.util.function.Consumer;
