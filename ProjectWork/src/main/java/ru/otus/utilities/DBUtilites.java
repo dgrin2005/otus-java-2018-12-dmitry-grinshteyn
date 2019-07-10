@@ -62,4 +62,18 @@ public class DBUtilites {
         String collectionName = ((ru.otus.annotation.Document) t.getAnnotation(ru.otus.annotation.Document.class)).value();
         return connection.getCollection(collectionName);
     }
+
+    public static Ddl getDdl() {
+        final String ddlName = properties.getProperty("ddl");
+        if (ddlName == null) {
+            return Ddl.CREATE;
+        }
+        return Ddl.valueOf(ddlName.toUpperCase());
+    }
+
+    public enum Ddl {
+        CREATE,
+        CREATEDROP,
+        UPDATE;
+    }
 }

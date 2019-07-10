@@ -1,6 +1,5 @@
 package ru.otus;
 
-import com.mongodb.client.MongoClient;
 import ru.otus.dao.DataSetDAO;
 import ru.otus.dao.DataSetDAOImpl;
 import ru.otus.dataset.AddressDataSet;
@@ -10,14 +9,10 @@ import ru.otus.exception.MyOrmException;
 
 import java.util.Arrays;
 
-import static ru.otus.utilities.DBUtilites.getDBName;
-import static ru.otus.utilities.DBUtilites.getMongoDbConnection;
-
 public class MainClass {
-    public static void main(String[] args) throws MyOrmException {
+    public static void main(String[] args) throws Exception {
         System.out.println("MONGODB ODM TEST");
-        try (final MongoClient connection = getMongoDbConnection()){
-            DataSetDAO dao = new DataSetDAOImpl(connection, getDBName());
+        try (final DataSetDAO dao = new DataSetDAOImpl()){
             workWithDB(dao);
         }
         System.out.println("---------");
@@ -76,10 +71,6 @@ public class MainClass {
         System.out.println("---");
         System.out.println("all users: " + dbService.getAll(UserDataSet.class));
         System.out.println("---");
-        System.out.println("Deleting all users...");
-        dbService.deleteAll(UserDataSet.class);
-        System.out.println("all users: " + dbService.getAll(UserDataSet.class));
-        dbService.deleteAll(AddressDataSet.class);
         System.out.println("all addresses: " + dbService.getAll(AddressDataSet.class));
     }
 

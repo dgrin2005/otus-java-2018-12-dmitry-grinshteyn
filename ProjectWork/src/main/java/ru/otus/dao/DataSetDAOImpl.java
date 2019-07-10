@@ -5,14 +5,26 @@ import com.mongodb.client.MongoDatabase;
 import org.bson.types.ObjectId;
 import ru.otus.exception.MyOrmException;
 import ru.otus.executor.Executor;
+import ru.otus.utilities.DBUtilites;
 
 import java.util.List;
 
-public class DataSetDAOImpl implements DataSetDAO {
+import static ru.otus.utilities.DBUtilites.getDBName;
+import static ru.otus.utilities.DBUtilites.getDdl;
+import static ru.otus.utilities.DBUtilites.getMongoDbConnection;
+
+public class DataSetDAOImpl implements DataSetDAO, AutoCloseable {
 
     private MongoDatabase connection;
+    private DBUtilites.Ddl ddl;
 
-    public DataSetDAOImpl(MongoClient client, String databaseName) {
+    public DataSetDAOImpl() throws MyOrmException {
+        MongoClient client = getMongoDbConnection();
+        String databaseName = getDBName();
+        this.ddl = getDdl();
+        if (ddl == DBUtilites.Ddl.CREATE || ddl == DBUtilites.Ddl.CREATEDROP) {
+            findAndDropDB(client, databaseName);
+        }
         this.connection = client.getDatabase(databaseName);
     }
 
@@ -54,4 +66,24 @@ public class DataSetDAOImpl implements DataSetDAO {
     public <T> T update(T t) throws MyOrmException {
         return Executor.update(connection, t);
     }
+
+    public void dropDB() {
+        connection.drop();
+    }
+
+    private void findAndDropDB(MongoClient client, String databaseName) {
+        for (String s : client.listDatabaseNames()) {
+            if (s.equals(databaseName)) {
+                client.getDatabase(databaseName).drop();
+            }
+        }
+    }
+
+    @Override
+    public void close() {
+        if (ddl == DBUtilites.Ddl.CREATEDROP) {
+            dropDB();
+        }
+    }
+
 }

@@ -5,7 +5,7 @@ import ru.otus.exception.MyOrmException;
 
 import java.util.List;
 
-public interface DataSetDAO {
+public interface DataSetDAO extends AutoCloseable {
 
     <T> T create(T t) throws MyOrmException;
 
