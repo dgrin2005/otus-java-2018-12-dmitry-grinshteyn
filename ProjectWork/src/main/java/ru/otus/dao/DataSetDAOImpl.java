@@ -15,11 +15,12 @@ import static ru.otus.utilities.DBUtilites.getMongoDbConnection;
 
 public class DataSetDAOImpl implements DataSetDAO, AutoCloseable {
 
+    private MongoClient client;
     private MongoDatabase connection;
     private DBUtilites.Ddl ddl;
 
     public DataSetDAOImpl() throws MyOrmException {
-        MongoClient client = getMongoDbConnection();
+        client = getMongoDbConnection();
         String databaseName = getDBName();
         this.ddl = getDdl();
         if (ddl == DBUtilites.Ddl.CREATE || ddl == DBUtilites.Ddl.CREATEDROP) {
@@ -67,7 +68,7 @@ public class DataSetDAOImpl implements DataSetDAO, AutoCloseable {
         return Executor.update(connection, t);
     }
 
-    public void dropDB() {
+    private void dropDB() {
         connection.drop();
     }
 
@@ -84,6 +85,7 @@ public class DataSetDAOImpl implements DataSetDAO, AutoCloseable {
         if (ddl == DBUtilites.Ddl.CREATEDROP) {
             dropDB();
         }
+        client.close();
     }
 
 }
