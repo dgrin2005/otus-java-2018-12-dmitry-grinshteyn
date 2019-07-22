@@ -1,15 +1,12 @@
 package ru.otus.executor;
 
 import org.bson.Document;
-import ru.otus.dataset.DataSet;
 import ru.otus.exception.MyOrmException;
 import ru.otus.annotation.*;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 class ExecutorUtilites {
 
@@ -31,13 +28,12 @@ class ExecutorUtilites {
         }
         try {
             Document document = new Document();
-            String idFieldName = getIdFieldName(tClass);
             List<Field> fields = getAllFields(tClass);
             for (Field field: fields) {
                 if(!field.isAccessible()){
                     field.setAccessible(true);
                 }
-                if (field.get(t).getClass().getSuperclass() == DataSet.class) {
+                if (field.get(t).getClass().isAnnotationPresent(ru.otus.annotation.Document.class)) {
                     document.append(field.getName(), createBSONFromObject(field.get(t)));
                 } else {
                     if (isImplementedInterface(field.get(t).getClass(), Collection.class)) {
@@ -56,11 +52,7 @@ class ExecutorUtilites {
                 }
             }
             document.append(MONGODB_CLASSNAME, tClass.getName());
-
-            if (!idFieldName.isEmpty()) {
-                document.append(MONGODB_ID, document.get(idFieldName));
-                document.remove(idFieldName);
-            }
+            replaceColumnNames(document, tClass);
             return document;
         } catch (IllegalAccessException e) {
             throw new MyOrmException(e);
@@ -74,6 +66,7 @@ class ExecutorUtilites {
         try {
             if (document.get(MONGODB_CLASSNAME).equals(t.getName())) {
                 List<Field> fields = getAllFields(t);
+                Map<String, String> correspondentFieldMap = getCorrespondentFieldMap(t);
                 T dataSet = (T) t.newInstance();
                 String idFieldName = getIdFieldName(t);
                 for (Field field : fields) {
@@ -81,19 +74,24 @@ class ExecutorUtilites {
                         field.setAccessible(true);
                     }
                     String fieldName = field.getName();
+                    String correspondentFieldName = correspondentFieldMap.get(fieldName);
+
+
                     if (!idFieldName.isEmpty()) {
                         if (fieldName.equals(idFieldName)) {
                             field.set(dataSet, document.get(MONGODB_ID));
                             return dataSet;
                         }
                     }
-                    if (document.get(fieldName) instanceof Document) {
-                        field.set(dataSet, createObjectFromBSON((Document)document.get(fieldName), field.getType()));
+
+
+                    if (document.get(correspondentFieldName) instanceof Document) {
+                        field.set(dataSet, createObjectFromBSON((Document)document.get(correspondentFieldName), field.getType()));
                     } else {
-                        if (document.get(fieldName) != null) {
-                            if (isImplementedInterface(document.get(field.getName()).getClass(), Collection.class)) {
+                        if (document.get(correspondentFieldName) != null) {
+                            if (isImplementedInterface(document.get(correspondentFieldName).getClass(), Collection.class)) {
                                 List<Object> list = new ArrayList<>();
-                                for (Object obj : (Collection) document.get(fieldName)) {
+                                for (Object obj : (Collection) document.get(correspondentFieldName)) {
                                     try {
                                         if (isPrimitive(obj.getClass())) {
                                             list.add(obj);
@@ -107,10 +105,10 @@ class ExecutorUtilites {
                                 }
                                 field.set(dataSet, list);
                             } else {
-                                field.set(dataSet, document.get(fieldName));
+                                field.set(dataSet, document.get(correspondentFieldName));
                             }
                         } else {
-                            field.set(dataSet, document.get(fieldName));
+                            field.set(dataSet, document.get(correspondentFieldName));
                         }
                     }
                 }
@@ -156,5 +154,41 @@ class ExecutorUtilites {
         }
         return idFieldName;
     }
+
+    static Map<String, Field> getFieldMap(Class t) {
+         return getAllFields(t).stream().collect(Collectors.toMap(Field::getName, x -> x));
+    }
+
+    static Map<String, String> getCorrespondentFieldMap(Class t) {
+        Map<String, String> correspondentFieldMap = new HashMap<>();
+        List<Field> fields = getAllFields(t);
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(Id.class)) {
+                correspondentFieldMap.put( field.getName(), MONGODB_ID);
+            } else {
+                if (field.isAnnotationPresent(Column.class)) {
+                    correspondentFieldMap.put(field.getName(), field.getAnnotation(ru.otus.annotation.Column.class).value());
+                } else {
+                    correspondentFieldMap.put(field.getName(), field.getName());
+                }
+            }
+        }
+        return correspondentFieldMap;
+    }
+
+    private static void replaceColumnNames(Document document, Class t) {
+        Map<String, String> correspondentFieldMap = getCorrespondentFieldMap(t);
+        List<Field> fields = getAllFields(t);
+        for (Field field : fields) {
+            String fieldName = field.getName();
+            String correspondentFieldName = correspondentFieldMap.get(fieldName);
+            if (!correspondentFieldName.equals(fieldName)) {
+                document.append(correspondentFieldName, document.get(fieldName));
+                document.remove(fieldName);
+            }
+        }
+
+    }
+
 
 }

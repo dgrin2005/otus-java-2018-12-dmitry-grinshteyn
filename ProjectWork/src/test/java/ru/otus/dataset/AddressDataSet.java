@@ -3,6 +3,8 @@ package ru.otus.dataset;
 import org.bson.types.ObjectId;
 import ru.otus.annotation.Document;
 
+import java.util.Objects;
+
 @Document("ads")
 public class AddressDataSet extends DataSet {
     private String street;
@@ -29,5 +31,20 @@ public class AddressDataSet extends DataSet {
                 "id=" + getId() +
                 ", street='" + street + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AddressDataSet)) return false;
+        if (!super.equals(o)) return false;
+        AddressDataSet that = (AddressDataSet) o;
+        return Objects.equals(getStreet(), that.getStreet());
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), getStreet());
     }
 }

@@ -1,12 +1,15 @@
 package ru.otus.dataset;
 
 import org.bson.types.ObjectId;
+import ru.otus.annotation.Column;
 import ru.otus.annotation.Document;
 
 import java.util.List;
+import java.util.Objects;
 
 @Document("uds")
 public class UserDataSet extends DataSet {
+    @Column("FIO")
     private String name;
     private int age;
     private AddressDataSet address;
@@ -72,4 +75,21 @@ public class UserDataSet extends DataSet {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserDataSet)) return false;
+        if (!super.equals(o)) return false;
+        UserDataSet that = (UserDataSet) o;
+        return getAge() == that.getAge() &&
+                Objects.equals(getName(), that.getName()) &&
+                Objects.equals(getAddress(), that.getAddress()) &&
+                Objects.equals(getPhones(), that.getPhones());
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), getName(), getAge(), getAddress(), getPhones());
+    }
 }
