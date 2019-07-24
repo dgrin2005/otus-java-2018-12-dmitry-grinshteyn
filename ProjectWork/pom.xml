@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.otus</groupId>
-    <artifactId>projectwork</artifactId>
+    <artifactId>mongodbodm</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>projectwork</name>
-    <description>OTUS Project Work</description>
+    <name>mongodbodm</name>
+    <description>MogoDB ODM - OTUS Project Work</description>
 
     <developers>
         <developer>
@@ -30,13 +30,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.0.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>ru.otus.MainClass</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -57,11 +50,6 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>ru.otus.MainClass</mainClass>
-                        </manifest>
-                    </archive>
                 </configuration>
             </plugin>
         </plugins>

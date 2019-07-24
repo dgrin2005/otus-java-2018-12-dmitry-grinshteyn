@@ -1,7 +1,7 @@
 package ru.otus.dataset;
 
 import org.bson.types.ObjectId;
-import ru.otus.annotation.Column;
+import ru.otus.annotation.Field;
 import ru.otus.annotation.Document;
 
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @Document("pds")
 public class PhoneDataSet extends DataSet {
-    @Column("phones")
+    @Field("phones")
     private List<String> numbers;
 
     public PhoneDataSet() {

@@ -4,7 +4,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import ru.otus.exception.MyOrmException;
+import ru.otus.exception.MongoODMException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,32 +29,32 @@ public class DBUtilites {
         }
     }
 
-    public static MongoClient getMongoDbConnection() throws MyOrmException {
+    public static MongoClient getMongoDbConnection() throws MongoODMException {
 
         final String uri = properties.getProperty(PROPERTIE_NAME_URI);
         if (uri == null) {
-            throw new MyOrmException("URI not found in file " + PROPERTIES_FILENAME);
+            throw new MongoODMException("URI not found in file " + PROPERTIES_FILENAME);
         }
         return MongoClients.create(uri);
     }
 
-    public static String getDBName() throws MyOrmException {
+    public static String getDBName() throws MongoODMException {
         final String dbname = properties.getProperty(PROPERTIE_NAME_DATABASE);
         if (dbname == null) {
-            throw new MyOrmException("Database name not found in file " + PROPERTIES_FILENAME);
+            throw new MongoODMException("Database name not found in file " + PROPERTIES_FILENAME);
         }
         return dbname;
     }
 
-    public static String getCollectionName(Class t) throws MyOrmException{
+    public static String getCollectionName(Class t) throws MongoODMException {
         if (!t.isAnnotationPresent(ru.otus.annotation.Document.class)) {
-            throw new MyOrmException("Class " + t + " does not match");
+            throw new MongoODMException("Class " + t + " does not match");
         }
         return ((ru.otus.annotation.Document) t.getAnnotation(ru.otus.annotation.Document.class)).value();
     }
 
     public static MongoCollection<org.bson.Document> getCollection(MongoDatabase connection, Class t)
-            throws MyOrmException {
+            throws MongoODMException {
         String collectionName = getCollectionName(t);
         return connection.getCollection(collectionName);
     }

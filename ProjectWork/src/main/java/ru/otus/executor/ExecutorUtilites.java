@@ -1,10 +1,9 @@
 package ru.otus.executor;
 
 import org.bson.Document;
-import ru.otus.exception.MyOrmException;
+import ru.otus.exception.MongoODMException;
 import ru.otus.annotation.*;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -13,23 +12,23 @@ class ExecutorUtilites {
     final static String MONGODB_ID = "_id";
     final static String MONGODB_CLASSNAME = "#classname";
 
-    static List<Field> getAllFields(Class<?> objectClass) {
-        List<Field> fields = new ArrayList<>(Arrays.asList(objectClass.getDeclaredFields()));
+    static List<java.lang.reflect.Field> getAllFields(Class<?> objectClass) {
+        List<java.lang.reflect.Field> fields = new ArrayList<>(Arrays.asList(objectClass.getDeclaredFields()));
         if (objectClass.getSuperclass() != null) {
             fields.addAll(getAllFields(objectClass.getSuperclass()));
         }
         return fields;
     }
 
-    static Document createBSONFromObject(Object t) throws MyOrmException {
+    static Document createBSONFromObject(Object t) throws MongoODMException {
         Class tClass = t.getClass();
         if (!tClass.isAnnotationPresent(ru.otus.annotation.Document.class)) {
-            throw new MyOrmException("Class " + tClass + " for object " + t + " does not match");
+            throw new MongoODMException("Class " + tClass + " for object " + t + " does not match");
         }
         try {
             Document document = new Document();
-            List<Field> fields = getAllFields(tClass);
-            for (Field field: fields) {
+            List<java.lang.reflect.Field> fields = getAllFields(tClass);
+            for (java.lang.reflect.Field field: fields) {
                 if(!field.isAccessible()){
                     field.setAccessible(true);
                 }
@@ -55,21 +54,21 @@ class ExecutorUtilites {
             replaceColumnNames(document, tClass);
             return document;
         } catch (IllegalAccessException e) {
-            throw new MyOrmException(e);
+            throw new MongoODMException(e);
         }
     }
 
-    static <T> T createObjectFromBSON(Document document, Class<?> t) throws MyOrmException {
+    static <T> T createObjectFromBSON(Document document, Class<?> t) throws MongoODMException {
         if (!t.isAnnotationPresent(ru.otus.annotation.Document.class)) {
-            throw new MyOrmException("Class " + t + " for document " + document + " does not match");
+            throw new MongoODMException("Class " + t + " for document " + document + " does not match");
         }
         try {
             if (document.get(MONGODB_CLASSNAME).equals(t.getName())) {
-                List<Field> fields = getAllFields(t);
+                List<java.lang.reflect.Field> fields = getAllFields(t);
                 Map<String, String> correspondentFieldMap = getCorrespondentFieldMap(t);
                 T dataSet = (T) t.newInstance();
                 String idFieldName = getIdFieldName(t);
-                for (Field field : fields) {
+                for (java.lang.reflect.Field field : fields) {
                     if(!field.isAccessible()){
                         field.setAccessible(true);
                     }
@@ -100,7 +99,7 @@ class ExecutorUtilites {
                                                     String.valueOf(((Document) obj).get(MONGODB_CLASSNAME)))));
                                         }
                                     } catch (ClassNotFoundException e) {
-                                        throw new MyOrmException(e);
+                                        throw new MongoODMException(e);
                                     }
                                 }
                                 field.set(dataSet, list);
@@ -114,10 +113,10 @@ class ExecutorUtilites {
                 }
                 return dataSet;
             } else {
-                throw  new MyOrmException("Class does not match");
+                throw  new MongoODMException("Class does not match");
             }
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new MyOrmException(e);
+            throw new MongoODMException(e);
         }
     }
 
@@ -140,34 +139,34 @@ class ExecutorUtilites {
                 t == Float.class || t == Double.class || t == String.class;
     }
 
-    static String getIdFieldName(Class t) throws MyOrmException {
-        List<Field> fields = getAllFields(t);
+    static String getIdFieldName(Class t) throws MongoODMException {
+        List<java.lang.reflect.Field> fields = getAllFields(t);
         String idFieldName = "";
-        for (Field field : fields) {
+        for (java.lang.reflect.Field field : fields) {
             if (field.isAnnotationPresent(Id.class)) {
                 if (idFieldName.isEmpty()) {
                     idFieldName = field.getName();
                 } else {
-                    throw new MyOrmException("Too much id in class " + t);
+                    throw new MongoODMException("Too much id in class " + t);
                 }
             }
         }
         return idFieldName;
     }
 
-    static Map<String, Field> getFieldMap(Class t) {
-         return getAllFields(t).stream().collect(Collectors.toMap(Field::getName, x -> x));
+    static Map<String, java.lang.reflect.Field> getFieldMap(Class t) {
+         return getAllFields(t).stream().collect(Collectors.toMap(java.lang.reflect.Field::getName, x -> x));
     }
 
     static Map<String, String> getCorrespondentFieldMap(Class t) {
         Map<String, String> correspondentFieldMap = new HashMap<>();
-        List<Field> fields = getAllFields(t);
-        for (Field field : fields) {
+        List<java.lang.reflect.Field> fields = getAllFields(t);
+        for (java.lang.reflect.Field field : fields) {
             if (field.isAnnotationPresent(Id.class)) {
                 correspondentFieldMap.put( field.getName(), MONGODB_ID);
             } else {
-                if (field.isAnnotationPresent(Column.class)) {
-                    correspondentFieldMap.put(field.getName(), field.getAnnotation(ru.otus.annotation.Column.class).value());
+                if (field.isAnnotationPresent(Field.class)) {
+                    correspondentFieldMap.put(field.getName(), field.getAnnotation(Field.class).value());
                 } else {
                     correspondentFieldMap.put(field.getName(), field.getName());
                 }
@@ -178,8 +177,8 @@ class ExecutorUtilites {
 
     private static void replaceColumnNames(Document document, Class t) {
         Map<String, String> correspondentFieldMap = getCorrespondentFieldMap(t);
-        List<Field> fields = getAllFields(t);
-        for (Field field : fields) {
+        List<java.lang.reflect.Field> fields = getAllFields(t);
+        for (java.lang.reflect.Field field : fields) {
             String fieldName = field.getName();
             String correspondentFieldName = correspondentFieldMap.get(fieldName);
             if (!correspondentFieldName.equals(fieldName)) {

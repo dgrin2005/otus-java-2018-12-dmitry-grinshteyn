@@ -23,16 +23,18 @@ import org.junit.Test;
 import ru.otus.dataset.AddressDataSet;
 import ru.otus.dataset.PhoneDataSet;
 import ru.otus.dataset.UserDataSet;
-import ru.otus.exception.MyOrmException;
+import ru.otus.exception.MongoODMException;
 import ru.otus.executor.Executor;
+import ru.otus.executor.MongoExecutor;
 
 public class EmbeddedMongoTest
 {
     private static final String DATABASE_NAME = "embedded";
 
-    private MongodExecutable mongodExe;
-    private MongodProcess mongod;
-    private MongoClient mongo;
+    private MongodExecutable mongodExecutable;
+    private MongodProcess mongodProcess;
+    private MongoDatabase mongoDatabase;
+    private Executor mongoExecutor;
 
     private AddressDataSet testAddress = new AddressDataSet("Lenina");
 
@@ -59,127 +61,104 @@ public class EmbeddedMongoTest
                 .version(Version.Main.PRODUCTION)
                 .net(new Net(bindIp, port, Network.localhostIsIPv6()))
                 .build();
-        this.mongodExe = starter.prepare(mongodConfig);
-        this.mongod = mongodExe.start();
-        this.mongo = MongoClients.create("mongodb://" + bindIp + ":" + port);
+        this.mongodExecutable = starter.prepare(mongodConfig);
+        this.mongodProcess = mongodExecutable.start();
+        MongoClient mongoClient = MongoClients.create("mongodb://" + bindIp + ":" + port);
+        this.mongoDatabase = mongoClient.getDatabase(DATABASE_NAME);
+        this.mongoExecutor = new MongoExecutor(mongoDatabase);
+        creatingTestingData(mongoDatabase);
     }
 
     @After
     public void afterEach() throws Exception {
-        if (this.mongod != null) {
-            this.mongod.stop();
-            this.mongodExe.stop();
+        if (this.mongodProcess != null) {
+            this.mongodProcess.stop();
+            this.mongodExecutable.stop();
         }
     }
 
     @Test
-    public void testCreateUsers() throws MyOrmException {
-        MongoDatabase db = mongo.getDatabase(DATABASE_NAME);
-        creatingTestingData(db);
-        MongoCollection<Document> ads = db.getCollection("uds", Document.class);
+    public void testCreateUsers() throws MongoODMException {
+        MongoCollection<Document> ads = mongoDatabase.getCollection("uds", Document.class);
         assertEquals(3L, ads.countDocuments());
     }
 
     @Test
-    public void testLoadById() throws MyOrmException {
-        MongoDatabase db = mongo.getDatabase(DATABASE_NAME);
-        creatingTestingData(db);
-        assertEquals(testUser1, Executor.load(db, testUser1.getId(), UserDataSet.class));
+    public void testLoadById() throws MongoODMException {
+        assertEquals(testUser1, mongoExecutor.load(testUser1.getId(), UserDataSet.class));
     }
 
     @Test
-    public void testLoadByName() throws MyOrmException {
-        MongoDatabase db = mongo.getDatabase(DATABASE_NAME);
-        creatingTestingData(db);
-        assertEquals(testUser1, Executor.loadByName(db, testUser1.getName(), UserDataSet.class));
+    public void testLoadByName() throws MongoODMException {
+        assertEquals(testUser1, mongoExecutor.loadByName(testUser1.getName(), UserDataSet.class));
     }
 
     @Test
-    public void testUpdate() throws MyOrmException {
-        MongoDatabase db = mongo.getDatabase(DATABASE_NAME);
-        creatingTestingData(db);
+    public void testUpdate() throws MongoODMException {
         testUser1.setName("Maria");
         testUser1.setAddress(new AddressDataSet("Kirova"));
         testUser1.setPhones(Arrays.asList(new PhoneDataSet("12345"), new PhoneDataSet("54321")));
-        Executor.update(db, testUser1);
-        assertEquals(testUser1, Executor.loadByName(db, testUser1.getName(), UserDataSet.class));
+        mongoExecutor.update(testUser1);
+        assertEquals(testUser1, mongoExecutor.loadByName(testUser1.getName(), UserDataSet.class));
     }
 
     @Test
-    public void testDeleteById() throws MyOrmException {
-        MongoDatabase db = mongo.getDatabase(DATABASE_NAME);
-        creatingTestingData(db);
-        Executor.deleteById(db, UserDataSet.class, testUser1.getId());
-        assertNull(Executor.load(db, testUser1.getId(), UserDataSet.class));
+    public void testDeleteById() throws MongoODMException {
+        mongoExecutor.deleteById(UserDataSet.class, testUser1.getId());
+        assertNull(mongoExecutor.load(testUser1.getId(), UserDataSet.class));
     }
 
     @Test
-    public void testDeleteByName() throws MyOrmException {
-        MongoDatabase db = mongo.getDatabase(DATABASE_NAME);
-        creatingTestingData(db);
-        Executor.deleteByName(db, UserDataSet.class, testUser1.getName());
-        assertNull(Executor.loadByName(db, testUser1.getName(), UserDataSet.class));
+    public void testDeleteByName() throws MongoODMException {
+        mongoExecutor.deleteByName(UserDataSet.class, testUser1.getName());
+        assertNull(mongoExecutor.loadByName(testUser1.getName(), UserDataSet.class));
     }
 
     @Test
-    public void testDeleteList() throws MyOrmException {
-        MongoDatabase db = mongo.getDatabase(DATABASE_NAME);
-        creatingTestingData(db);
-        Executor.deleteList(db, Arrays.asList(testUser1, testUser3));
-        assertNull(Executor.load(db, testUser1.getId(), UserDataSet.class));
-        assertNull(Executor.load(db, testUser3.getId(), UserDataSet.class));
+    public void testDeleteList() throws MongoODMException {
+        mongoExecutor.deleteList(Arrays.asList(testUser1, testUser3));
+        assertNull(mongoExecutor.load(testUser1.getId(), UserDataSet.class));
+        assertNull(mongoExecutor.load(testUser3.getId(), UserDataSet.class));
     }
 
     @Test
-    public void testDeleteAll() throws MyOrmException {
-        MongoDatabase db = mongo.getDatabase(DATABASE_NAME);
-        creatingTestingData(db);
-        MongoCollection<Document> uds = db.getCollection("uds", Document.class);
-        Executor.deleteAll(db, UserDataSet.class);
+    public void testDeleteAll() throws MongoODMException {
+        MongoCollection<Document> uds = mongoDatabase.getCollection("uds", Document.class);
+        mongoExecutor.deleteAll(UserDataSet.class);
         assertEquals(0L, uds.countDocuments());
     }
 
     @Test
-    public void testEqual() throws MyOrmException {
-        MongoDatabase db = mongo.getDatabase(DATABASE_NAME);
-        creatingTestingData(db);
-        assertEquals(2, Executor.loadWhenEqual(db, UserDataSet.class, "address", testAddress).size());
-        assertEquals(1, Executor.loadWhenEqual(db, UserDataSet.class, "name", "Ivan").size());
-        assertEquals(testUser1, Executor.loadWhenEqual(db, UserDataSet.class, "name", "Ivan").get(0));
+    public void testEqual() throws MongoODMException {
+        assertEquals(2, mongoExecutor.loadWhenEqual(UserDataSet.class, "address", testAddress).size());
+        assertEquals(1, mongoExecutor.loadWhenEqual(UserDataSet.class, "name", "Ivan").size());
+        assertEquals(testUser1, mongoExecutor.loadWhenEqual(UserDataSet.class, "name", "Ivan").get(0));
     }
 
     @Test
-    public void testNotEqual() throws MyOrmException {
-        MongoDatabase db = mongo.getDatabase(DATABASE_NAME);
-        creatingTestingData(db);
-        assertEquals(1, Executor.loadWhenNotEqual(db, UserDataSet.class, "age", 23).size());
+    public void testNotEqual() throws MongoODMException {
+        assertEquals(1, mongoExecutor.loadWhenNotEqual(UserDataSet.class, "age", 23).size());
     }
 
     @Test
-    public void testGreaterThan() throws MyOrmException {
-        MongoDatabase db = mongo.getDatabase(DATABASE_NAME);
-        creatingTestingData(db);
-        assertEquals(1, Executor.loadWhenGreaterThan(db, UserDataSet.class, "age", 23).size());
+    public void testGreaterThan() throws MongoODMException {
+        assertEquals(1, mongoExecutor.loadWhenGreaterThan(UserDataSet.class, "age", 23).size());
     }
 
     @Test
-    public void testLessThan() throws MyOrmException {
-        MongoDatabase db = mongo.getDatabase(DATABASE_NAME);
-        creatingTestingData(db);
-        assertEquals(2, Executor.loadWhenLessThan(db, UserDataSet.class, "age", 30).size());
+    public void testLessThan() throws MongoODMException {
+        assertEquals(2, mongoExecutor.loadWhenLessThan(UserDataSet.class, "age", 30).size());
     }
 
-    private void creatingTestingData(MongoDatabase db) throws MyOrmException {
+    private void creatingTestingData(MongoDatabase db) throws MongoODMException {
         db.createCollection("uds");
         db.createCollection("pds");
         db.createCollection("ads");
-        Executor.save(db, testAddress);
-        Executor.save(db, testPhone);
-        Executor.save(db, testUser1);
-        Executor.save(db, testUser2);
-        Executor.save(db, testUser3);
+        mongoExecutor.save(testAddress);
+        mongoExecutor.save(testPhone);
+        mongoExecutor.save(testUser1);
+        mongoExecutor.save(testUser2);
+        mongoExecutor.save(testUser3);
     }
-
-
 
 }

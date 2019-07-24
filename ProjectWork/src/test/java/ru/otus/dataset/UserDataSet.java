@@ -1,7 +1,7 @@
 package ru.otus.dataset;
 
 import org.bson.types.ObjectId;
-import ru.otus.annotation.Column;
+import ru.otus.annotation.Field;
 import ru.otus.annotation.Document;
 
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Document("uds")
 public class UserDataSet extends DataSet {
-    @Column("FIO")
+    @Field("FIO")
     private String name;
     private int age;
     private AddressDataSet address;
